@@ -1,0 +1,7 @@
+export { DashboardPage } from './Dashboard'
+export { ProductsPage } from './Products'
+export { ProductEditPage } from './ProductEdit'
+export { LooksPage } from './Looks'
+export { LookEditPage } from './LookEdit'
+export { UsersPage } from './Users'
+export { UserProfilePage } from './UserProfile'
