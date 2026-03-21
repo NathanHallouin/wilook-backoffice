@@ -4,7 +4,7 @@ A modern backoffice application for managing a fashion e-commerce business, buil
 
 ## Tech Stack
 
-- **React 18** with TypeScript (strict mode)
+- **React 19** with TypeScript (strict mode)
 - **React Router v7** for routing
 - **TanStack Query** for data fetching and caching
 - **Zustand** for lightweight state management
