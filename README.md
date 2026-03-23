@@ -2,6 +2,8 @@
 
 A modern backoffice application for managing a fashion e-commerce business, built with React and best practices.
 
+![Screenshot](screenshot.png)
+
 ## Tech Stack
 
 - **React 19** with TypeScript (strict mode)
