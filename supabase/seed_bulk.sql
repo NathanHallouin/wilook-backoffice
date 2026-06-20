@@ -118,9 +118,15 @@ select
   fn.v,
   ln.v,
   (array[300, 500, 800, 1000, 1500, 2000, 3000])[1 + floor(random() * 7)::int],
+  -- styles/colors are string arrays (the UI maps over them).
   jsonb_build_object(
-    'styles', to_jsonb((array['Casual','Chic','Business','Sport','Bohème','Minimaliste'])[1 + floor(random() * 6)::int]),
-    'colors', to_jsonb((array['Noir','Bleu','Beige','Blanc','Rouge','Vert'])[1 + floor(random() * 6)::int])
+    'styles', jsonb_build_array(
+      (array['Casual','Chic','Business','Sport','Bohème','Minimaliste'])[1 + floor(random() * 6)::int]
+    ),
+    'colors', jsonb_build_array(
+      (array['Noir','Bleu','Beige','Blanc','Rouge','Vert'])[1 + floor(random() * 6)::int],
+      (array['Noir','Bleu','Beige','Blanc','Rouge','Vert'])[1 + floor(random() * 6)::int]
+    )
   ),
   jsonb_build_object(
     'top',    (array['36','38','40','42','44'])[1 + floor(random() * 5)::int],

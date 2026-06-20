@@ -5,7 +5,17 @@ interface CustomerInfoProps {
   customer: Customer
 }
 
+/** Coerce a value into a string array — tolerates a single string or junk. */
+const toStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) return value.filter((v): v is string => typeof v === 'string')
+  if (typeof value === 'string' && value.trim()) return [value]
+  return []
+}
+
 export function CustomerInfo({ customer }: CustomerInfoProps) {
+  const styles = toStringArray(customer.style_preferences?.styles)
+  const colors = toStringArray(customer.style_preferences?.colors)
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-4">
       <h3 className="text-sm font-medium text-gray-700 mb-3">Informations client</h3>
@@ -52,15 +62,15 @@ export function CustomerInfo({ customer }: CustomerInfoProps) {
         )}
 
         {/* Style preferences */}
-        {customer.style_preferences && (
+        {(styles.length > 0 || colors.length > 0) && (
           <div>
             <div className="flex items-center gap-1 text-xs font-medium text-gray-500 mb-1">
               <SwatchIcon className="h-3 w-3" />
               <span>Style</span>
             </div>
-            {customer.style_preferences.styles && customer.style_preferences.styles.length > 0 && (
+            {styles.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {customer.style_preferences.styles.map((style) => (
+                {styles.map((style) => (
                   <span
                     key={style}
                     className="px-2 py-0.5 bg-brand-100 text-brand-700 rounded text-xs"
@@ -70,9 +80,9 @@ export function CustomerInfo({ customer }: CustomerInfoProps) {
                 ))}
               </div>
             )}
-            {customer.style_preferences.colors && customer.style_preferences.colors.length > 0 && (
+            {colors.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-1">
-                {customer.style_preferences.colors.map((color) => (
+                {colors.map((color) => (
                   <span
                     key={color}
                     className="px-2 py-0.5 bg-gray-100 rounded text-xs"

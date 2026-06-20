@@ -4,8 +4,22 @@ interface QuestionnaireProps {
   customer: Customer
 }
 
+/** Coerce a value into a string array — tolerates a single string or junk. */
+const toStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) return value.filter((v): v is string => typeof v === 'string')
+  if (typeof value === 'string' && value.trim()) return [value]
+  return []
+}
+
 export function Questionnaire({ customer }: QuestionnaireProps) {
   const { questionnaire_data, sizes, budget, style_preferences } = customer
+
+  // Defensive: real questionnaire data may not be a clean string[] (e.g. a
+  // single value), so normalize before rendering.
+  const styles = toStringArray(style_preferences?.styles)
+  const colors = toStringArray(style_preferences?.colors)
+  const avoid = toStringArray(style_preferences?.avoid)
+  const hasStylePrefs = styles.length > 0 || colors.length > 0 || avoid.length > 0
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-6">
@@ -53,13 +67,13 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
           <h3 className="text-sm font-medium text-gray-500 mb-2">
             Préférences de style
           </h3>
-          {style_preferences ? (
+          {hasStylePrefs ? (
             <div className="space-y-2">
-              {style_preferences.styles && style_preferences.styles.length > 0 && (
+              {styles.length > 0 && (
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Styles</p>
                   <div className="flex flex-wrap gap-2">
-                    {style_preferences.styles.map((style) => (
+                    {styles.map((style) => (
                       <span
                         key={style}
                         className="px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-sm"
@@ -70,11 +84,11 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
                   </div>
                 </div>
               )}
-              {style_preferences.colors && style_preferences.colors.length > 0 && (
+              {colors.length > 0 && (
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Couleurs préférées</p>
                   <div className="flex flex-wrap gap-2">
-                    {style_preferences.colors.map((color) => (
+                    {colors.map((color) => (
                       <span
                         key={color}
                         className="px-3 py-1 bg-gray-100 rounded-full text-sm"
@@ -85,11 +99,11 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
                   </div>
                 </div>
               )}
-              {style_preferences.avoid && style_preferences.avoid.length > 0 && (
+              {avoid.length > 0 && (
                 <div>
                   <p className="text-xs text-gray-500 mb-1">À éviter</p>
                   <div className="flex flex-wrap gap-2">
-                    {style_preferences.avoid.map((item) => (
+                    {avoid.map((item) => (
                       <span
                         key={item}
                         className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm"
