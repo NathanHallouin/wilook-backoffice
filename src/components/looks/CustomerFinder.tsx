@@ -19,7 +19,7 @@ export function CustomerFinder({ onSelect, selectedEmail }: CustomerFinderProps)
       <h3 className="text-sm font-medium text-gray-700 mb-3">Rechercher un client</h3>
 
       <div className="relative">
-        <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}

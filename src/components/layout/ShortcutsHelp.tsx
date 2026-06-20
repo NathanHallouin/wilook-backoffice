@@ -39,7 +39,7 @@ export function ShortcutsHelp({ isOpen, onClose }: ShortcutsHelpProps) {
       <div className="space-y-5">
         {GROUPS.map((group) => (
           <div key={group.title}>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
               {group.title}
             </h4>
             <ul className="space-y-2">

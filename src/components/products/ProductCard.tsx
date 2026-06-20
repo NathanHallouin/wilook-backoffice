@@ -122,7 +122,7 @@ export function ProductCard({
 
       {/* Info */}
       <div className="flex min-h-0 flex-1 flex-col p-3">
-        <p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+        <p className="text-[11px] font-medium uppercase tracking-wide text-gray-500">
           {PRODUCT_CATEGORY_LABELS[product.category]}
           {product.type ? ` · ${product.type}` : ''}
         </p>
@@ -145,7 +145,7 @@ export function ProductCard({
               </span>
             ))}
             {product.colors.length > 3 && (
-              <span className="px-1 py-0.5 text-[11px] text-gray-400">
+              <span className="px-1 py-0.5 text-[11px] text-gray-500">
                 +{product.colors.length - 3}
               </span>
             )}
@@ -159,7 +159,7 @@ export function ProductCard({
               <span className="text-sm font-semibold text-red-600">
                 {priceFmt.format(product.final_price!)}
               </span>
-              <span className="text-xs text-gray-400 line-through">
+              <span className="text-xs text-gray-500 line-through">
                 {priceFmt.format(product.price)}
               </span>
             </>

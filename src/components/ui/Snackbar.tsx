@@ -43,7 +43,7 @@ export function SnackbarContainer() {
             </p>
             <button
               onClick={() => removeMessage(message.id)}
-              className="-mr-1 rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+              className="-mr-1 rounded-md p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-600"
             >
               <XMarkIcon className="h-4 w-4" />
             </button>

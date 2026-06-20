@@ -92,7 +92,12 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
   `role="combobox"`/`listbox`/`option` + `aria-expanded`/`aria-selected`. **Menus
   de carte** (produits/looks) : `Échap` pour fermer, `aria-haspopup`/
   `aria-expanded`, `role="menu"`/`menuitem`. Couvert par 11 tests (Modal +
-  Combobox). *Reste* : audit des contrastes (vérification visuelle).
+  Combobox).
+- **3.1bis — Audit des contrastes (WCAG AA)** : ratios calculés (conversion
+  oklch→sRGB) sur toutes les paires texte/fond clés, en clair **et** sombre.
+  Corrigés : libellés secondaires et icônes `text-gray-400` → `gray-500`
+  (≥ 4.5 / ≥ 3:1 pour les boutons-icône, WCAG 1.4.11), badge « Public »
+  `emerald-500` → `emerald-700` (2.46 → 5.48). Tous les usages réels passent AA.
 - **4.2 — Migrations versionnées** : `supabase/schema.sql` déplacé en
   `supabase/migrations/20260620120000_initial_schema.sql` (format Supabase CLI,
   toujours collable dans le SQL Editor). Ajout de `supabase/config.toml`
@@ -119,7 +124,7 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
   changements OS ; **bouton bascule** (lune/soleil) dans la navbar. Overlays
   passés en `bg-black/*`, shimmer du skeleton atténué. **Vérifié visuellement**
   (captures Playwright : dashboard, produits, drawer — clair & sombre) + 3 tests
-  sur le store. *Reste* : audit fin des contrastes.
+  sur le store. Contrastes audités (voir 3.1bis).
 
 > **Hors-roadmap, en support des tests** : source de vérité typée des
 > vocabulaires produit (`src/config/formValues.ts` : catégories→types, couleurs,
@@ -127,6 +132,12 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
 > dessus (Détails, Pointures, Fournisseur, Description ajoutés), et générateur de
 > données de masse `supabase/seed_bulk.sql` (500 produits / 200 clients / 120
 > looks, images picsum) — **chargé et vérifié en base live**.
+
+> **Statut global** : tous les items des phases 0 → 4 sont livrés. Seul reste
+> **0.3 — rotation du mot de passe DB**, qui est une action manuelle côté
+> Supabase (Settings → Database → Reset password) et ne peut pas être faite
+> depuis le repo. Les tableaux ci-dessous décrivent l'état *initial* du projet et
+> sont conservés pour mémoire.
 
 ---
 

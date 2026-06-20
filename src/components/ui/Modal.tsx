@@ -121,7 +121,7 @@ export function Modal({
               <button
                 onClick={onClose}
                 aria-label="Fermer"
-                className="-mr-1 rounded-lg p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                className="-mr-1 rounded-lg p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-600"
               >
                 <XMarkIcon className="h-5 w-5" />
               </button>

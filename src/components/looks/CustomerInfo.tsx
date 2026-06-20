@@ -22,7 +22,7 @@ export function CustomerInfo({ customer }: CustomerInfoProps) {
         {/* Budget */}
         {customer.budget && (
           <div className="flex items-center gap-2 text-sm">
-            <CurrencyEuroIcon className="h-4 w-4 text-gray-400" />
+            <CurrencyEuroIcon className="h-4 w-4 text-gray-500" />
             <span>Budget: {customer.budget}€</span>
           </div>
         )}

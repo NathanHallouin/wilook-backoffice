@@ -93,7 +93,7 @@ export function LookPreview({ slots, onSlotClick, onDrop, onClear, activeSlot }:
             )}
           </>
         ) : (
-          <span className="text-xs text-gray-400 text-center p-2">
+          <span className="text-xs text-gray-500 text-center p-2">
             {slotLabels[slot]}
           </span>
         )}

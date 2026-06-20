@@ -44,7 +44,7 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
               )}
             </div>
           ) : (
-            <p className="text-gray-400">Non renseigné</p>
+            <p className="text-gray-500">Non renseigné</p>
           )}
         </div>
 
@@ -57,7 +57,7 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
             <div className="space-y-2">
               {style_preferences.styles && style_preferences.styles.length > 0 && (
                 <div>
-                  <p className="text-xs text-gray-400 mb-1">Styles</p>
+                  <p className="text-xs text-gray-500 mb-1">Styles</p>
                   <div className="flex flex-wrap gap-2">
                     {style_preferences.styles.map((style) => (
                       <span
@@ -72,7 +72,7 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
               )}
               {style_preferences.colors && style_preferences.colors.length > 0 && (
                 <div>
-                  <p className="text-xs text-gray-400 mb-1">Couleurs préférées</p>
+                  <p className="text-xs text-gray-500 mb-1">Couleurs préférées</p>
                   <div className="flex flex-wrap gap-2">
                     {style_preferences.colors.map((color) => (
                       <span
@@ -87,7 +87,7 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
               )}
               {style_preferences.avoid && style_preferences.avoid.length > 0 && (
                 <div>
-                  <p className="text-xs text-gray-400 mb-1">À éviter</p>
+                  <p className="text-xs text-gray-500 mb-1">À éviter</p>
                   <div className="flex flex-wrap gap-2">
                     {style_preferences.avoid.map((item) => (
                       <span
@@ -102,7 +102,7 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
               )}
             </div>
           ) : (
-            <p className="text-gray-400">Non renseigné</p>
+            <p className="text-gray-500">Non renseigné</p>
           )}
         </div>
 

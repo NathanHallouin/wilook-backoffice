@@ -110,7 +110,7 @@ export function LookCard({
         )}
 
         {look.is_public && (
-          <span className="absolute left-2 top-2 rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-medium text-white shadow-sm">
+          <span className="absolute left-2 top-2 rounded-full bg-emerald-700 px-2 py-0.5 text-xs font-medium text-white shadow-sm">
             Public
           </span>
         )}

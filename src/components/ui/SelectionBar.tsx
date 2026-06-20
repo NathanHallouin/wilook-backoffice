@@ -34,7 +34,7 @@ export function SelectionBar({
       <div className="shadow-pop flex items-center gap-3 rounded-2xl border border-gray-200 bg-surface px-3 py-2">
         <button
           onClick={onClear}
-          className="rounded-lg p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+          className="rounded-lg p-1 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-600"
           aria-label="Annuler la sélection"
         >
           <XMarkIcon className="h-5 w-5" />
