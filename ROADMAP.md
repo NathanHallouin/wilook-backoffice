@@ -93,6 +93,24 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
   de carte** (produits/looks) : `Échap` pour fermer, `aria-haspopup`/
   `aria-expanded`, `role="menu"`/`menuitem`. Couvert par 11 tests (Modal +
   Combobox). *Reste* : audit des contrastes (vérification visuelle).
+- **4.2 — Migrations versionnées** : `supabase/schema.sql` déplacé en
+  `supabase/migrations/20260620120000_initial_schema.sql` (format Supabase CLI,
+  toujours collable dans le SQL Editor). Ajout de `supabase/config.toml`
+  (`db push` / `db reset` + seed auto) et `supabase/README.md` (workflow). La
+  migration complète (tables + vues + RPC + RLS + storage) a été **validée de
+  bout en bout et en idempotence** sur un Postgres jetable.
+- **4.3 — Déploiement** : `vercel.json` (framework Vite, build `dist/`, **fallback
+  SPA** pour le routage client) → import du repo + 2 variables d'env. Section
+  **Deployment** ajoutée au README (Vercel + alternative Netlify/Cloudflare).
+- **2.7 — Raccourcis clavier** : hook `useGlobalShortcuts` (intégré au `Layout`)
+  — navigation type Gmail **`g` puis `d`/`p`/`l`/`u`** (Dashboard/Produits/Looks/
+  Users) et **`?`** ouvre une modale d'aide (`ShortcutsHelp`) qui recense aussi
+  les raccourcis contextuels (`Ctrl/⌘+A`, `Suppr`, `Échap`, `Ctrl/⌘+Z`). Ignorés
+  pendant la saisie / avec un modificateur. Couvert par 6 tests unitaires + 1 e2e.
+- **3.4 — Favicon & branding** : `favicon.svg` vérifié — c'est un vrai logo
+  WILOOK multicolore (conservé tel quel). `index.html` complété : `description`,
+  Open Graph (`og:title`/`description`/`type`/`locale`), `application-name`,
+  `apple-touch-icon`. (`lang="fr"`, `theme-color` et `<title>` déjà en place.)
 
 > **Hors-roadmap, en support des tests** : source de vérité typée des
 > vocabulaires produit (`src/config/formValues.ts` : catégories→types, couleurs,
