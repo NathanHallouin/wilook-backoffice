@@ -61,7 +61,7 @@ export function ProductFiltersDrawer({
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-40"
+          className="animate-fade-in fixed inset-0 z-40 bg-gray-900/30 backdrop-blur-sm"
           onClick={onClose}
         />
       )}
@@ -69,14 +69,19 @@ export function ProductFiltersDrawer({
       {/* Drawer */}
       <div
         className={cn(
-          'fixed top-0 right-0 h-full w-80 bg-white shadow-xl z-50',
-          'transform transition-transform duration-300',
+          'shadow-pop fixed right-0 top-0 z-50 h-full w-80 border-l border-gray-200 bg-white',
+          'transform transition-transform duration-300 ease-out',
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">Filtres</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+        <div className="flex items-center justify-between border-b border-gray-100 p-4">
+          <h2 className="text-base font-semibold tracking-tight text-gray-900">
+            Filtres
+          </h2>
+          <button
+            onClick={onClose}
+            className="-mr-1 rounded-lg p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+          >
             <XMarkIcon className="h-5 w-5" />
           </button>
         </div>

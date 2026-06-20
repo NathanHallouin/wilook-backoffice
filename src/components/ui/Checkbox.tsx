@@ -29,12 +29,12 @@ export function Checkbox({
         onChange={(e) => onChange(e.target.checked)}
         disabled={disabled}
         className={cn(
-          'h-4 w-4 rounded border-gray-300 text-indigo-600',
-          'focus:ring-indigo-500 focus:ring-2',
+          'h-4 w-4 cursor-pointer rounded border-gray-300 text-brand-600',
+          'focus:ring-2 focus:ring-brand-500/40 focus:ring-offset-0',
           'disabled:cursor-not-allowed'
         )}
       />
-      {label && <span className="ml-2 text-sm text-gray-700">{label}</span>}
+      {label && <span className="ml-2 select-none text-sm text-gray-700">{label}</span>}
     </label>
   )
 }

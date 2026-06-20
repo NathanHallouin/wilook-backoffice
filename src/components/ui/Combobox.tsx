@@ -73,23 +73,22 @@ export function Combobox({
   return (
     <div className="w-full" ref={containerRef}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="mb-1.5 block text-sm font-medium text-gray-700">
           {label}
         </label>
       )}
       <div className="relative">
         <div
           className={cn(
-            'min-h-[38px] w-full rounded-md border border-gray-300 bg-white px-3 py-1.5',
-            'flex flex-wrap gap-1 items-center cursor-pointer',
-            'focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500'
+            'flex min-h-[38px] w-full cursor-text flex-wrap items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 shadow-sm transition-colors',
+            'focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/30'
           )}
           onClick={() => setIsOpen(true)}
         >
           {selected.map((item) => (
             <span
               key={item}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800"
             >
               {item}
               <button
@@ -98,7 +97,7 @@ export function Combobox({
                   e.stopPropagation()
                   handleRemove(item)
                 }}
-                className="hover:text-indigo-600"
+                className="hover:text-brand-600"
               >
                 <XMarkIcon className="h-3 w-3" />
               </button>
@@ -110,21 +109,26 @@ export function Combobox({
             onChange={(e) => setSearch(e.target.value)}
             onFocus={() => setIsOpen(true)}
             placeholder={selected.length === 0 ? placeholder : ''}
-            className="flex-1 min-w-[100px] outline-none text-sm"
+            className="min-w-[100px] flex-1 text-sm outline-none placeholder:text-gray-400"
           />
-          <ChevronDownIcon className="h-4 w-4 text-gray-400" />
+          <ChevronDownIcon
+            className={cn(
+              'h-4 w-4 flex-shrink-0 text-gray-400 transition-transform',
+              isOpen && 'rotate-180'
+            )}
+          />
         </div>
 
         {isOpen && (
-          <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-auto">
+          <div className="shadow-pop animate-fade-in absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl border border-gray-100 bg-white p-1">
             {filteredOptions.map((option) => (
               <button
                 key={option}
                 type="button"
                 onClick={() => handleSelect(option)}
                 className={cn(
-                  'w-full px-3 py-2 text-left text-sm hover:bg-gray-100',
-                  selected.includes(option) && 'bg-indigo-50 text-indigo-700'
+                  'w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-gray-50',
+                  selected.includes(option) && 'bg-brand-50 font-medium text-brand-700'
                 )}
               >
                 {option}
@@ -134,15 +138,13 @@ export function Combobox({
               <button
                 type="button"
                 onClick={handleCreate}
-                className="w-full px-3 py-2 text-left text-sm text-indigo-600 hover:bg-indigo-50"
+                className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-brand-600 hover:bg-brand-50"
               >
-                Créer "{search}"
+                Créer «&nbsp;{search}&nbsp;»
               </button>
             )}
             {filteredOptions.length === 0 && !allowCreate && (
-              <div className="px-3 py-2 text-sm text-gray-500">
-                Aucun résultat
-              </div>
+              <div className="px-3 py-2 text-sm text-gray-500">Aucun résultat</div>
             )}
           </div>
         )}

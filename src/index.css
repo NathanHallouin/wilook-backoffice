@@ -1,6 +1,58 @@
 @import "tailwindcss";
 
-/* Custom utilities */
+/* ----------------------------------------------------------------------------
+   Design tokens
+---------------------------------------------------------------------------- */
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Brand accent — a refined iris / indigo-violet */
+  --color-brand-50: #f5f4ff;
+  --color-brand-100: #ecebfe;
+  --color-brand-200: #dbd9fe;
+  --color-brand-300: #c0bbfc;
+  --color-brand-400: #a195f9;
+  --color-brand-500: #836df3;
+  --color-brand-600: #6c4fe6;
+  --color-brand-700: #5b3fcc;
+  --color-brand-800: #4c36a6;
+  --color-brand-900: #413084;
+
+  /* Soft, layered shadows for a lighter, more premium feel */
+  --shadow-card: 0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 3px 0 rgb(16 24 40 / 0.06);
+  --shadow-card-hover: 0 8px 24px -6px rgb(16 24 40 / 0.12), 0 2px 6px -2px rgb(16 24 40 / 0.08);
+  --shadow-pop: 0 12px 32px -8px rgb(16 24 40 / 0.18);
+}
+
+/* ----------------------------------------------------------------------------
+   Base
+---------------------------------------------------------------------------- */
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  color: var(--color-gray-900);
+  background-color: var(--color-gray-50);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Consistent focus ring for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------------------------
+   Custom utilities
+---------------------------------------------------------------------------- */
 .h-card {
   height: 420px;
 }
@@ -13,44 +65,73 @@
   z-index: 100;
 }
 
+/* ----------------------------------------------------------------------------
+   Animations
+---------------------------------------------------------------------------- */
 @keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-
 .animate-fade-in {
-  animation: fade-in 0.3s ease-in-out;
+  animation: fade-in 0.25s ease-out;
 }
 
-/* Scrollbar styling */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-rise-in {
+  animation: rise-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-gray-100);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.6),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-rise-in,
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Scrollbar
+---------------------------------------------------------------------------- */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: var(--color-gray-300);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
-
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
-#root {
-  min-height: 100vh;
+  background: var(--color-gray-400);
+  background-clip: content-box;
 }

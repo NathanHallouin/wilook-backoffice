@@ -1,12 +1,17 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { FunnelIcon, PlusIcon } from '@heroicons/react/24/outline'
+import { FunnelIcon, PlusIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
 import { Toolbar } from '@/components/layout'
-import { Button } from '@/components/ui'
+import { Button, CardGridSkeleton, EmptyState, useConfirm } from '@/components/ui'
 import { ProductCard, ProductFiltersDrawer } from '@/components/products'
-import { useProducts, useBrands, useProductTypes, useDeleteProduct } from '@/hooks'
+import {
+  useInfiniteProducts,
+  useBrands,
+  useProductTypes,
+  useDeleteProduct,
+} from '@/hooks'
 import { useSnackbarStore, useInterfaceStore } from '@/stores'
-import type { Product, ProductFilters } from '@/types'
+import type { ProductFilters } from '@/types'
 
 const COMMON_COLORS = ['Noir', 'Blanc', 'Bleu', 'Rouge', 'Vert', 'Gris', 'Beige', 'Marron']
 const COMMON_MATERIALS = ['Coton', 'Laine', 'Soie', 'Lin', 'Polyester', 'Cuir', 'Denim']
@@ -17,8 +22,6 @@ export function ProductsPage() {
   const { filtersOpen, setFiltersOpen } = useInterfaceStore()
   const { success, error: showError } = useSnackbarStore()
 
-  const [page, setPage] = useState(1)
-  const [allProducts, setAllProducts] = useState<Product[]>([])
   const loaderRef = useRef<HTMLDivElement>(null)
 
   // Parse filters from URL
@@ -31,45 +34,31 @@ export function ProductsPage() {
     maxPrice: searchParams.get('maxprice') ? Number(searchParams.get('maxprice')) : undefined,
   }
 
-  const { data, isLoading } = useProducts(filters, { page })
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteProducts(filters)
   const { data: brands = [] } = useBrands()
   const { data: types = [] } = useProductTypes()
   const deleteProduct = useDeleteProduct()
+  const confirm = useConfirm()
 
-  // Accumulate products for infinite scroll
-  useEffect(() => {
-    if (data?.data) {
-      if (page === 1) {
-        setAllProducts(data.data)
-      } else {
-        setAllProducts((prev) => [...prev, ...data.data])
-      }
-    }
-  }, [data, page])
+  const allProducts = data?.pages.flatMap((p) => p.data) ?? []
+  const count = data?.pages[0]?.count ?? 0
 
-  // Reset when filters change
-  useEffect(() => {
-    setPage(1)
-    setAllProducts([])
-  }, [searchParams])
-
-  // Infinite scroll
+  // Infinite scroll — fetch the next page when the sentinel comes into view
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isLoading && data && allProducts.length < data.count) {
-          setPage((p) => p + 1)
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage()
         }
       },
       { threshold: 0.1 }
     )
 
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current)
-    }
-
+    const el = loaderRef.current
+    if (el) observer.observe(el)
     return () => observer.disconnect()
-  }, [isLoading, data, allProducts.length])
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const handleFiltersChange = useCallback(
     (newFilters: ProductFilters) => {
@@ -86,9 +75,15 @@ export function ProductsPage() {
   )
 
   const handleDelete = async (id: string) => {
+    const ok = await confirm({
+      title: 'Supprimer le produit',
+      message: 'Ce produit sera définitivement supprimé. Cette action est irréversible.',
+      confirmLabel: 'Supprimer',
+      danger: true,
+    })
+    if (!ok) return
     try {
       await deleteProduct.mutateAsync(id)
-      setAllProducts((prev) => prev.filter((p) => p.id !== id))
       success('Produit supprimé')
     } catch {
       showError('Erreur lors de la suppression')
@@ -98,44 +93,59 @@ export function ProductsPage() {
   return (
     <div className="min-h-screen">
       <Toolbar title="Produits">
-        <Button
-          variant="ghost"
-          onClick={() => setFiltersOpen(!filtersOpen)}
-        >
-          <FunnelIcon className="h-5 w-5 mr-2" />
+        <Button variant="ghost" onClick={() => setFiltersOpen(!filtersOpen)}>
+          <FunnelIcon className="mr-2 h-5 w-5" />
           Filtres
         </Button>
         <Button onClick={() => navigate('/products/edit')}>
-          <PlusIcon className="h-5 w-5 mr-2" />
+          <PlusIcon className="mr-2 h-5 w-5" />
           Ajouter
         </Button>
       </Toolbar>
 
       <div className="p-6">
         {/* Stats */}
-        <p className="text-sm text-gray-500 mb-4">
-          {data?.count ?? 0} produit{(data?.count ?? 0) > 1 ? 's' : ''}
+        <p className="mb-4 text-sm text-gray-500">
+          {count} produit{count > 1 ? 's' : ''}
         </p>
 
-        {/* Products grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {allProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
-
-        {/* Loader */}
-        <div ref={loaderRef} className="h-10 mt-4">
-          {isLoading && (
-            <div className="flex justify-center">
-              <div className="animate-spin h-6 w-6 border-2 border-indigo-600 border-t-transparent rounded-full" />
+        {isLoading && allProducts.length === 0 ? (
+          <CardGridSkeleton count={10} />
+        ) : allProducts.length === 0 ? (
+          <EmptyState
+            icon={ShoppingBagIcon}
+            title="Aucun produit"
+            description="Aucun produit ne correspond à vos filtres. Ajustez-les ou ajoutez un nouveau produit."
+            action={
+              <Button onClick={() => navigate('/products/edit')}>
+                <PlusIcon className="mr-2 h-5 w-5" />
+                Ajouter un produit
+              </Button>
+            }
+          />
+        ) : (
+          <>
+            {/* Products grid */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {allProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onDelete={handleDelete}
+                />
+              ))}
             </div>
-          )}
-        </div>
+
+            {/* Infinite-scroll sentinel */}
+            <div ref={loaderRef} className="mt-6 h-10">
+              {isFetchingNextPage && (
+                <div className="flex justify-center">
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-600 border-t-transparent" />
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <ProductFiltersDrawer

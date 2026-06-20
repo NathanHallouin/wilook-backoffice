@@ -8,7 +8,7 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
   const { questionnaire_data, sizes, budget, style_preferences } = customer
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
         Questionnaire
       </h2>
@@ -62,7 +62,7 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
                     {style_preferences.styles.map((style) => (
                       <span
                         key={style}
-                        className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm"
+                        className="px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-sm"
                       >
                         {style}
                       </span>

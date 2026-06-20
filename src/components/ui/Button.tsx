@@ -12,10 +12,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500',
-  secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
-  danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-  ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500',
+  primary:
+    'bg-brand-600 text-white shadow-sm hover:bg-brand-700 focus-visible:ring-brand-500',
+  secondary:
+    'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-gray-400',
+  danger:
+    'bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-500',
+  ghost:
+    'bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-gray-400',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -36,10 +40,10 @@ export function Button({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center rounded-md font-medium',
-        'focus:outline-none focus:ring-2 focus:ring-offset-2',
-        'transition-colors duration-200',
-        'disabled:opacity-50 disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center rounded-lg font-medium',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+        'transition-all duration-150 active:scale-[0.98]',
+        'disabled:pointer-events-none disabled:opacity-50',
         variantClasses[variant],
         sizeClasses[size],
         className

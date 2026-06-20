@@ -7,7 +7,7 @@ interface CustomerInfoProps {
 
 export function CustomerInfo({ customer }: CustomerInfoProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-4">
+    <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-4">
       <h3 className="text-sm font-medium text-gray-700 mb-3">Informations client</h3>
 
       <div className="space-y-3">
@@ -63,7 +63,7 @@ export function CustomerInfo({ customer }: CustomerInfoProps) {
                 {customer.style_preferences.styles.map((style) => (
                   <span
                     key={style}
-                    className="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs"
+                    className="px-2 py-0.5 bg-brand-100 text-brand-700 rounded text-xs"
                   >
                     {style}
                   </span>

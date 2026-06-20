@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Toolbar } from '@/components/layout'
 import { Button, Input, Select, Combobox, UploadImages } from '@/components/ui'
@@ -53,32 +53,47 @@ export function ProductEditPage() {
 
   const [formData, setFormData] = useState<ProductFormData>(initialFormData)
   const [pendingFiles, setPendingFiles] = useState<File[]>([])
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
-  useEffect(() => {
-    if (existingProduct) {
-      setFormData({
-        title: existingProduct.title,
-        description: existingProduct.description,
-        category: existingProduct.category,
-        type: existingProduct.type,
-        condition: existingProduct.condition,
-        brand: existingProduct.brand,
-        provider: existingProduct.provider,
-        colors: existingProduct.colors,
-        materials: existingProduct.materials,
-        details: existingProduct.details,
-        sizes: existingProduct.sizes,
-        shoe_sizes: existingProduct.shoe_sizes,
-        price: existingProduct.price,
-        final_price: existingProduct.final_price,
-        images: existingProduct.images,
-        thumbnail: existingProduct.thumbnail,
-      })
-    }
-  }, [existingProduct])
+  // Hydrate the form from the loaded product (and when switching products).
+  // Guarded render-time state adjustment — see https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  const [hydratedId, setHydratedId] = useState<string | null>(null)
+  if (existingProduct && hydratedId !== existingProduct.id) {
+    setHydratedId(existingProduct.id)
+    setFormData({
+      title: existingProduct.title,
+      description: existingProduct.description,
+      category: existingProduct.category,
+      type: existingProduct.type,
+      condition: existingProduct.condition,
+      brand: existingProduct.brand,
+      provider: existingProduct.provider,
+      colors: existingProduct.colors,
+      materials: existingProduct.materials,
+      details: existingProduct.details,
+      sizes: existingProduct.sizes,
+      shoe_sizes: existingProduct.shoe_sizes,
+      price: existingProduct.price,
+      final_price: existingProduct.final_price,
+      images: existingProduct.images,
+      thumbnail: existingProduct.thumbnail,
+    })
+  }
+
+  const validate = () => {
+    const next: Record<string, string> = {}
+    if (!formData.title.trim()) next.title = 'Le titre est requis'
+    if (!formData.type.trim()) next.type = 'Le type est requis'
+    if (!(formData.price > 0)) next.price = 'Le prix doit être supérieur à 0'
+    if (formData.final_price != null && formData.final_price >= formData.price)
+      next.final_price = 'Le prix promo doit être inférieur au prix'
+    setErrors(next)
+    return Object.keys(next).length === 0
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!validate()) return
 
     try {
       let product: Product
@@ -145,7 +160,7 @@ export function ProductEditPage() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin h-8 w-8 border-2 border-indigo-600 border-t-transparent rounded-full" />
+        <div className="animate-spin h-8 w-8 border-2 border-brand-600 border-t-transparent rounded-full" />
       </div>
     )
   }
@@ -167,13 +182,14 @@ export function ProductEditPage() {
       <form onSubmit={handleSubmit} className="p-6 max-w-4xl">
         <div className="space-y-6">
           {/* Basic info */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
-            <h2 className="text-lg font-medium">Informations générales</h2>
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6 space-y-4">
+            <h2 className="text-base font-semibold text-gray-900">Informations générales</h2>
 
             <Input
               label="Titre"
               value={formData.title}
               onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+              error={errors.title}
               required
             />
 
@@ -191,6 +207,7 @@ export function ProductEditPage() {
                 value={formData.type}
                 onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
                 placeholder="Ex: T-shirt, Pantalon..."
+                error={errors.type}
               />
             </div>
 
@@ -217,8 +234,8 @@ export function ProductEditPage() {
           </div>
 
           {/* Attributes */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
-            <h2 className="text-lg font-medium">Attributs</h2>
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6 space-y-4">
+            <h2 className="text-base font-semibold text-gray-900">Attributs</h2>
 
             <Combobox
               label="Couleurs"
@@ -245,8 +262,8 @@ export function ProductEditPage() {
           </div>
 
           {/* Price */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
-            <h2 className="text-lg font-medium">Prix</h2>
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6 space-y-4">
+            <h2 className="text-base font-semibold text-gray-900">Prix</h2>
 
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -258,6 +275,7 @@ export function ProductEditPage() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, price: Number(e.target.value) }))
                 }
+                error={errors.price}
               />
               <Input
                 label="Prix final (promo)"
@@ -271,13 +289,14 @@ export function ProductEditPage() {
                     final_price: e.target.value ? Number(e.target.value) : null,
                   }))
                 }
+                error={errors.final_price}
               />
             </div>
           </div>
 
           {/* Images */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
-            <h2 className="text-lg font-medium">Images</h2>
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6 space-y-4">
+            <h2 className="text-base font-semibold text-gray-900">Images</h2>
             <UploadImages
               images={formData.images}
               onUpload={handleImageUpload}

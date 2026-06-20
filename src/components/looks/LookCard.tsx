@@ -1,5 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import { EllipsisVerticalIcon, PencilIcon, TrashIcon, UsersIcon } from '@heroicons/react/24/outline'
+import {
+  EllipsisVerticalIcon,
+  PencilIcon,
+  TrashIcon,
+  UsersIcon,
+  SparklesIcon,
+} from '@heroicons/react/24/outline'
 import { useState } from 'react'
 import { cn } from '@/utils/cn'
 import type { Look } from '@/types'
@@ -23,90 +29,106 @@ export function LookCard({ look, onDelete }: LookCardProps) {
     setShowMenu(false)
   }
 
-  const hasProducts = look.left_top || look.left_bottom || look.right_top || look.right_middle || look.right_bottom
+  const hasProducts =
+    look.left_top ||
+    look.left_bottom ||
+    look.right_top ||
+    look.right_middle ||
+    look.right_bottom
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-look hover:shadow-md transition-shadow relative group">
-      {/* Look preview */}
-      <div className="h-48 bg-gray-100 relative">
+    <div className="group relative flex h-look flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
+      {/* Preview */}
+      <div className="relative h-48 overflow-hidden bg-gray-100">
         {look.thumbnail ? (
           <img
             src={look.thumbnail}
             alt={look.name || 'Look'}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
         ) : hasProducts ? (
-          <div className="w-full h-full grid grid-cols-2 gap-1 p-2">
-            {/* Simple 2x2 preview grid */}
-            <div className="bg-gray-200 rounded" />
-            <div className="bg-gray-200 rounded" />
-            <div className="bg-gray-200 rounded" />
-            <div className="bg-gray-200 rounded" />
+          <div className="grid h-full w-full grid-cols-2 gap-1 p-2">
+            <div className="rounded bg-gray-200" />
+            <div className="rounded bg-gray-200" />
+            <div className="rounded bg-gray-200" />
+            <div className="rounded bg-gray-200" />
           </div>
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            Look vide
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-gray-300">
+            <SparklesIcon className="h-9 w-9" />
+            <span className="text-xs">Look vide</span>
           </div>
         )}
 
         {look.is_public && (
-          <span className="absolute top-2 left-2 px-2 py-0.5 bg-green-500 text-white text-xs rounded-full">
+          <span className="absolute left-2 top-2 rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-medium text-white shadow-sm">
             Public
           </span>
         )}
       </div>
 
       {/* Info */}
-      <div className="p-3">
-        <p className="text-sm font-medium text-gray-900 truncate">
+      <div className="flex flex-1 flex-col p-3">
+        <p className="truncate text-sm font-semibold text-gray-900">
           {look.name || 'Sans nom'}
         </p>
         {look.designer && (
-          <p className="text-xs text-gray-500 mt-0.5">{look.designer}</p>
+          <p className="mt-0.5 truncate text-xs text-gray-500">{look.designer}</p>
         )}
 
-        {/* Customers count */}
         {(look.customers_count ?? 0) > 0 && (
-          <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
+          <div className="mt-auto flex items-center gap-1.5 pt-2 text-xs text-gray-500">
             <UsersIcon className="h-4 w-4" />
-            <span>{look.customers_count} client{(look.customers_count ?? 0) > 1 ? 's' : ''}</span>
+            <span>
+              {look.customers_count} client{(look.customers_count ?? 0) > 1 ? 's' : ''}
+            </span>
           </div>
         )}
       </div>
 
-      {/* Menu button */}
-      <div className="absolute top-2 right-2">
+      {/* Menu */}
+      <div className="absolute right-2 top-2">
         <button
           onClick={(e) => {
             e.stopPropagation()
-            setShowMenu(!showMenu)
+            setShowMenu((s) => !s)
           }}
           className={cn(
-            'p-1 bg-white rounded-full shadow transition-opacity',
-            'opacity-0 group-hover:opacity-100'
+            'rounded-full bg-white/90 p-1.5 text-gray-600 shadow-sm ring-1 ring-gray-200 backdrop-blur transition',
+            'hover:bg-white hover:text-gray-900',
+            showMenu ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
           )}
         >
-          <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
+          <EllipsisVerticalIcon className="h-5 w-5" />
         </button>
 
         {showMenu && (
-          <div className="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg border z-10">
-            <button
-              onClick={handleEdit}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              <PencilIcon className="h-4 w-4" />
-              Modifier
-            </button>
-            <button
-              onClick={handleDelete}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50"
-            >
-              <TrashIcon className="h-4 w-4" />
-              Supprimer
-            </button>
-          </div>
+          <>
+            <div
+              className="fixed inset-0 z-10"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowMenu(false)
+              }}
+            />
+            <div className="shadow-pop absolute right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border border-gray-100 bg-white py-1">
+              <button
+                onClick={handleEdit}
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                <PencilIcon className="h-4 w-4" />
+                Modifier
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+              >
+                <TrashIcon className="h-4 w-4" />
+                Supprimer
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>

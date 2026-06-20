@@ -63,16 +63,16 @@ export function UploadImages({
       {images.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {images.map((url, index) => (
-            <div key={url} className="relative group aspect-square">
+            <div key={url} className="group relative aspect-square">
               <img
                 src={url}
                 alt={`Image ${index + 1}`}
-                className="w-full h-full object-cover rounded-lg"
+                className="h-full w-full rounded-xl object-cover ring-1 ring-gray-200"
               />
               <button
                 type="button"
                 onClick={() => onRemove(index)}
-                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white opacity-0 shadow-sm transition-opacity hover:bg-red-600 group-hover:opacity-100"
               >
                 <XMarkIcon className="h-4 w-4" />
               </button>
@@ -88,16 +88,16 @@ export function UploadImages({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={cn(
-            'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
+            'rounded-xl border-2 border-dashed p-8 text-center transition-colors',
             isDragging
-              ? 'border-indigo-500 bg-indigo-50'
-              : 'border-gray-300 hover:border-gray-400'
+              ? 'border-brand-500 bg-brand-50'
+              : 'border-gray-300 hover:border-brand-400 hover:bg-gray-50'
           )}
         >
-          <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
+          <PhotoIcon className="mx-auto h-10 w-10 text-gray-300" />
           <p className="mt-2 text-sm text-gray-600">
             Glissez-déposez des images ici, ou{' '}
-            <label className="text-indigo-600 hover:text-indigo-500 cursor-pointer">
+            <label className="text-brand-600 hover:text-brand-500 cursor-pointer">
               parcourez
               <input
                 type="file"

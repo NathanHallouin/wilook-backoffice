@@ -20,16 +20,16 @@ const slotLabels: Record<LookSlot, string> = {
 export function LookPreview({ slots, onSlotClick, onDrop, activeSlot }: LookPreviewProps) {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
-    e.currentTarget.classList.add('ring-2', 'ring-indigo-500')
+    e.currentTarget.classList.add('ring-2', 'ring-brand-500')
   }
 
   const handleDragLeave = (e: React.DragEvent) => {
-    e.currentTarget.classList.remove('ring-2', 'ring-indigo-500')
+    e.currentTarget.classList.remove('ring-2', 'ring-brand-500')
   }
 
   const handleDrop = (e: React.DragEvent, slot: LookSlot) => {
     e.preventDefault()
-    e.currentTarget.classList.remove('ring-2', 'ring-indigo-500')
+    e.currentTarget.classList.remove('ring-2', 'ring-brand-500')
 
     try {
       const productData = e.dataTransfer.getData('application/json')
@@ -49,11 +49,10 @@ export function LookPreview({ slots, onSlotClick, onDrop, activeSlot }: LookPrev
       <div
         key={slot}
         className={cn(
-          'bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 relative',
-          'flex items-center justify-center cursor-pointer transition-all',
-          'hover:border-indigo-400 hover:bg-indigo-50',
-          activeSlot === slot && 'border-indigo-500 bg-indigo-50',
-          product && 'border-solid border-gray-200',
+          'relative flex cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all',
+          'hover:border-brand-400 hover:bg-brand-50',
+          activeSlot === slot && 'border-brand-500 bg-brand-50',
+          product && 'border-solid border-gray-200 bg-gray-100',
           className
         )}
         onClick={() => onSlotClick?.(slot)}
@@ -77,7 +76,7 @@ export function LookPreview({ slots, onSlotClick, onDrop, activeSlot }: LookPrev
   }
 
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm border">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-card">
       <h3 className="text-sm font-medium text-gray-700 mb-3">Prévisualisation</h3>
 
       {/* 5-slot layout grid */}

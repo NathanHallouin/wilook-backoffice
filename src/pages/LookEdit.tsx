@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { FunnelIcon } from '@heroicons/react/24/outline'
 import { Toolbar } from '@/components/layout'
@@ -45,22 +45,23 @@ export function LookEditPage() {
   const { data: brands = [] } = useBrands()
   const { data: types = [] } = useProductTypes()
 
-  // Load existing look
-  useEffect(() => {
-    if (existingLook) {
-      setName(existingLook.name || '')
-      setDesigner(existingLook.designer || '')
-      setUniverse(existingLook.universe || '')
-      setIsPublic(existingLook.is_public)
-      setSlots({
-        left_top: existingLook.left_top_product || null,
-        left_bottom: existingLook.left_bottom_product || null,
-        right_top: existingLook.right_top_product || null,
-        right_middle: existingLook.right_middle_product || null,
-        right_bottom: existingLook.right_bottom_product || null,
-      })
-    }
-  }, [existingLook])
+  // Hydrate the form from the loaded look (and when switching looks).
+  // Guarded render-time state adjustment — see https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  const [hydratedId, setHydratedId] = useState<string | null>(null)
+  if (existingLook && hydratedId !== existingLook.id) {
+    setHydratedId(existingLook.id)
+    setName(existingLook.name || '')
+    setDesigner(existingLook.designer || '')
+    setUniverse(existingLook.universe || '')
+    setIsPublic(existingLook.is_public)
+    setSlots({
+      left_top: existingLook.left_top_product || null,
+      left_bottom: existingLook.left_bottom_product || null,
+      right_top: existingLook.right_top_product || null,
+      right_middle: existingLook.right_middle_product || null,
+      right_bottom: existingLook.right_bottom_product || null,
+    })
+  }
 
   const handleDrop = useCallback((slot: LookSlot, product: Product) => {
     setSlots((prev) => ({ ...prev, [slot]: product }))
@@ -113,7 +114,7 @@ export function LookEditPage() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin h-8 w-8 border-2 border-indigo-600 border-t-transparent rounded-full" />
+        <div className="animate-spin h-8 w-8 border-2 border-brand-600 border-t-transparent rounded-full" />
       </div>
     )
   }
@@ -153,7 +154,7 @@ export function LookEditPage() {
             <LookPreview slots={slots} onDrop={handleDrop} />
 
             {/* Look info */}
-            <div className="bg-white rounded-lg shadow-sm border p-4 space-y-3">
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-4 space-y-3">
               <h3 className="text-sm font-medium text-gray-700">Informations</h3>
               <Input
                 label="Nom du look"
@@ -182,7 +183,7 @@ export function LookEditPage() {
 
           {/* Right - Products grid */}
           <div className="lg:col-span-9">
-            <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-4">
               <h3 className="text-sm font-medium text-gray-700 mb-4">
                 Glissez les produits vers le look
               </h3>

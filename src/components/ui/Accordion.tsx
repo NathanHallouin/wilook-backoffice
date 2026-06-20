@@ -16,7 +16,7 @@ export function Accordion({ title, children, defaultOpen = false }: AccordionPro
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between py-3 text-left text-sm font-medium text-gray-900 hover:text-indigo-600"
+        className="flex w-full items-center justify-between py-3 text-left text-sm font-medium text-gray-900 hover:text-brand-600"
       >
         {title}
         <ChevronDownIcon

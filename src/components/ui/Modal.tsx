@@ -35,6 +35,15 @@ export function Modal({
     }
   }, [isOpen])
 
+  useEffect(() => {
+    if (!isOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen, onClose])
+
   if (!isOpen) return null
 
   return (
@@ -42,23 +51,25 @@ export function Modal({
       <div className="flex min-h-full items-center justify-center p-4">
         {/* Backdrop */}
         <div
-          className="fixed inset-0 bg-black/50 transition-opacity"
+          className="animate-fade-in fixed inset-0 bg-gray-900/40 backdrop-blur-sm"
           onClick={onClose}
         />
 
         {/* Modal */}
         <div
           className={cn(
-            'relative w-full bg-white rounded-lg shadow-xl animate-fade-in',
+            'animate-rise-in shadow-pop relative w-full rounded-2xl bg-white',
             sizeClasses[size]
           )}
         >
           {title && (
-            <div className="flex items-center justify-between px-6 py-4 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+              <h3 className="text-lg font-semibold tracking-tight text-gray-900">
+                {title}
+              </h3>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600"
+                className="-mr-1 rounded-lg p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
               >
                 <XMarkIcon className="h-5 w-5" />
               </button>

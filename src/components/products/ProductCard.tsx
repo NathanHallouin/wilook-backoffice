@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { EllipsisVerticalIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
+import {
+  EllipsisVerticalIcon,
+  PencilIcon,
+  TrashIcon,
+  PhotoIcon,
+} from '@heroicons/react/24/outline'
 import { cn } from '@/utils/cn'
 import { PRODUCT_CATEGORY_LABELS } from '@/config/constants'
 import type { Product } from '@/types'
@@ -11,6 +16,11 @@ interface ProductCardProps {
   draggable?: boolean
   onDragStart?: (e: React.DragEvent, product: Product) => void
 }
+
+const priceFmt = new Intl.NumberFormat('fr-FR', {
+  style: 'currency',
+  currency: 'EUR',
+})
 
 export function ProductCard({
   product,
@@ -31,54 +41,70 @@ export function ProductCard({
     setShowMenu(false)
   }
 
+  const onSale = product.final_price != null && product.final_price < product.price
+  const discount = onSale
+    ? Math.round((1 - product.final_price! / product.price) * 100)
+    : 0
+
   return (
     <div
       className={cn(
-        'bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-card',
-        'hover:shadow-md transition-shadow relative group',
+        'group relative flex h-card flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white',
+        'shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover',
         draggable && 'cursor-grab active:cursor-grabbing'
       )}
       draggable={draggable}
       onDragStart={(e) => onDragStart?.(e, product)}
     >
       {/* Image */}
-      <div className="aspect-square bg-gray-100 relative">
+      <div className="relative aspect-square overflow-hidden bg-gray-100">
         {product.thumbnail ? (
           <img
             src={product.thumbnail}
             alt={product.title}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            Pas d'image
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-gray-300">
+            <PhotoIcon className="h-10 w-10" />
+            <span className="text-xs">Pas d'image</span>
           </div>
+        )}
+
+        {onSale && (
+          <span className="absolute left-2 top-2 rounded-full bg-red-500 px-2 py-0.5 text-xs font-semibold text-white shadow-sm">
+            -{discount}%
+          </span>
         )}
       </div>
 
       {/* Info */}
-      <div className="p-3">
-        <p className="text-xs text-gray-500 uppercase">
-          {PRODUCT_CATEGORY_LABELS[product.category]} - {product.type}
+      <div className="flex min-h-0 flex-1 flex-col p-3">
+        <p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+          {PRODUCT_CATEGORY_LABELS[product.category]}
+          {product.type ? ` · ${product.type}` : ''}
         </p>
-        <p className="text-sm font-medium text-gray-900 truncate mt-1">
-          {product.brand}
+        <p className="mt-1 truncate text-sm font-semibold text-gray-900">
+          {product.title}
         </p>
+        {product.brand && (
+          <p className="truncate text-xs text-gray-500">{product.brand}</p>
+        )}
 
         {/* Colors */}
         {product.colors.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
+          <div className="mt-2 flex flex-wrap gap-1">
             {product.colors.slice(0, 3).map((color) => (
               <span
                 key={color}
-                className="text-xs px-1.5 py-0.5 bg-gray-100 rounded"
+                className="rounded-md bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-600"
               >
                 {color}
               </span>
             ))}
             {product.colors.length > 3 && (
-              <span className="text-xs text-gray-500">
+              <span className="px-1 py-0.5 text-[11px] text-gray-400">
                 +{product.colors.length - 3}
               </span>
             )}
@@ -86,53 +112,66 @@ export function ProductCard({
         )}
 
         {/* Price */}
-        <div className="mt-2 flex items-center gap-2">
-          {product.final_price && product.final_price < product.price ? (
+        <div className="mt-auto flex items-baseline gap-2 pt-2">
+          {onSale ? (
             <>
               <span className="text-sm font-semibold text-red-600">
-                {product.final_price}€
+                {priceFmt.format(product.final_price!)}
               </span>
               <span className="text-xs text-gray-400 line-through">
-                {product.price}€
+                {priceFmt.format(product.price)}
               </span>
             </>
           ) : (
             <span className="text-sm font-semibold text-gray-900">
-              {product.price}€
+              {priceFmt.format(product.price)}
             </span>
           )}
         </div>
       </div>
 
-      {/* Menu button */}
-      <div className="absolute top-2 right-2">
+      {/* Menu */}
+      <div className="absolute right-2 top-2">
         <button
           onClick={(e) => {
             e.stopPropagation()
-            setShowMenu(!showMenu)
+            setShowMenu((s) => !s)
           }}
-          className="p-1 bg-white rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity"
+          className={cn(
+            'rounded-full bg-white/90 p-1.5 text-gray-600 shadow-sm ring-1 ring-gray-200 backdrop-blur transition',
+            'hover:bg-white hover:text-gray-900',
+            showMenu ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          )}
         >
-          <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
+          <EllipsisVerticalIcon className="h-5 w-5" />
         </button>
 
         {showMenu && (
-          <div className="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg border z-10">
-            <button
-              onClick={handleEdit}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              <PencilIcon className="h-4 w-4" />
-              Modifier
-            </button>
-            <button
-              onClick={handleDelete}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50"
-            >
-              <TrashIcon className="h-4 w-4" />
-              Supprimer
-            </button>
-          </div>
+          <>
+            <div
+              className="fixed inset-0 z-10"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowMenu(false)
+              }}
+            />
+            <div className="shadow-pop absolute right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border border-gray-100 bg-white py-1">
+              <button
+                onClick={handleEdit}
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                <PencilIcon className="h-4 w-4" />
+                Modifier
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+              >
+                <TrashIcon className="h-4 w-4" />
+                Supprimer
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
