@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 import * as looksService from '@/services/looks'
 import type { Look, FetchOptions } from '@/types'
 import type { LookFilter } from '@/services/looks'
@@ -9,6 +14,20 @@ export function useLooks(filter: LookFilter = 'all', options?: FetchOptions) {
   return useQuery({
     queryKey: [QUERY_KEY, filter, options],
     queryFn: () => looksService.fetchLooks(filter, options),
+  })
+}
+
+/** Paginated looks for infinite scroll (mirrors useInfiniteProducts). */
+export function useInfiniteLooks(filter: LookFilter = 'all') {
+  return useInfiniteQuery({
+    queryKey: [QUERY_KEY, 'infinite', filter],
+    queryFn: ({ pageParam }) =>
+      looksService.fetchLooks(filter, { page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const loaded = allPages.reduce((sum, p) => sum + p.data.length, 0)
+      return loaded < lastPage.count ? allPages.length + 1 : undefined
+    },
   })
 }
 

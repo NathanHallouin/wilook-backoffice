@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase'
 import { mockDb } from './mockData'
 import { TABLES, STORAGE_BUCKETS, PAGINATION } from '@/config/constants'
+import { processImage } from '@/utils/image'
 import type { Product, ProductFilters, FetchOptions } from '@/types'
 
 export interface FetchProductsResult {
@@ -182,12 +183,13 @@ export async function uploadProductImage(productId: string, file: File): Promise
     return URL.createObjectURL(file)
   }
 
-  const fileExt = file.name.split('.').pop()
-  const fileName = `${productId}/${Date.now()}.${fileExt}`
+  const processed = await processImage(file)
+  const ext = processed.type === 'image/webp' ? 'webp' : processed.name.split('.').pop()
+  const fileName = `${productId}/${Date.now()}.${ext}`
 
   const { error: uploadError } = await supabase!.storage
     .from(STORAGE_BUCKETS.PRODUCTS_IMAGES)
-    .upload(fileName, file)
+    .upload(fileName, processed, { contentType: processed.type })
 
   if (uploadError) {
     throw new Error(`Failed to upload image: ${uploadError.message}`)

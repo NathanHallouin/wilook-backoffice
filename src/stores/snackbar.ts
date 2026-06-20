@@ -16,8 +16,9 @@ export const useSnackbarStore = create<SnackbarState>((set, get) => ({
 
   addMessage: (message) => {
     const id = crypto.randomUUID()
+    // Keep at most the 4 most recent toasts.
     set((state) => ({
-      messages: [...state.messages, { ...message, id }],
+      messages: [...state.messages, { ...message, id }].slice(-4),
     }))
 
     // Auto-remove after 5 seconds

@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from './supabase'
 import { mockDb } from './mockData'
 import { TABLES, RPC_FUNCTIONS, STORAGE_BUCKETS, PAGINATION } from '@/config/constants'
+import { processImage } from '@/utils/image'
 import type { Look, LookWithProducts, FetchOptions } from '@/types'
 
 export interface FetchLooksResult {
@@ -217,12 +218,13 @@ export async function uploadLookThumbnail(lookId: string, file: File): Promise<s
     return URL.createObjectURL(file)
   }
 
-  const fileExt = file.name.split('.').pop()
-  const fileName = `${lookId}/thumbnail.${fileExt}`
+  const processed = await processImage(file)
+  const ext = processed.type === 'image/webp' ? 'webp' : processed.name.split('.').pop()
+  const fileName = `${lookId}/thumbnail.${ext}`
 
   const { error: uploadError } = await supabase!.storage
     .from(STORAGE_BUCKETS.LOOKS_IMAGES)
-    .upload(fileName, file, { upsert: true })
+    .upload(fileName, processed, { contentType: processed.type, upsert: true })
 
   if (uploadError) {
     throw new Error(`Failed to upload thumbnail: ${uploadError.message}`)

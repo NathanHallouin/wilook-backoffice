@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 import * as productsService from '@/services/products'
 import type { Product, ProductFilters, FetchOptions } from '@/types'
 
@@ -8,6 +13,23 @@ export function useProducts(filters?: ProductFilters, options?: FetchOptions) {
   return useQuery({
     queryKey: [QUERY_KEY, filters, options],
     queryFn: () => productsService.fetchProducts(filters, options),
+  })
+}
+
+/**
+ * Paginated products for infinite scroll. TanStack Query owns page
+ * accumulation, so the page component needs no manual page state or effects.
+ */
+export function useInfiniteProducts(filters?: ProductFilters) {
+  return useInfiniteQuery({
+    queryKey: [QUERY_KEY, 'infinite', filters],
+    queryFn: ({ pageParam }) =>
+      productsService.fetchProducts(filters, { page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const loaded = allPages.reduce((sum, p) => sum + p.data.length, 0)
+      return loaded < lastPage.count ? allPages.length + 1 : undefined
+    },
   })
 }
 

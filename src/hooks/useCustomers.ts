@@ -1,13 +1,20 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from '@tanstack/react-query'
 import * as customersService from '@/services/customers'
-import type { Customer, FetchOptions } from '@/types'
+import type { Customer } from '@/types'
 
 const QUERY_KEY = 'customers'
 
-export function useCustomers(options?: FetchOptions) {
+export function useCustomers(params?: customersService.FetchCustomersParams) {
   return useQuery({
-    queryKey: [QUERY_KEY, options],
-    queryFn: () => customersService.fetchCustomers(options),
+    queryKey: [QUERY_KEY, 'list', params],
+    queryFn: () => customersService.fetchCustomers(params),
+    // Keep showing the previous page while sorting/searching to avoid flicker.
+    placeholderData: keepPreviousData,
   })
 }
 

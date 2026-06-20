@@ -1,29 +1,77 @@
 import { supabase, isSupabaseConfigured } from './supabase'
 import { mockDb } from './mockData'
 import { TABLES, RPC_FUNCTIONS, PAGINATION } from '@/config/constants'
-import type { Customer, CustomerWithStats, FetchOptions } from '@/types'
+import type { Customer, CustomerWithStats } from '@/types'
 
 export interface FetchCustomersResult {
   data: CustomerWithStats[]
   count: number
 }
 
-export async function fetchCustomers(options?: FetchOptions): Promise<FetchCustomersResult> {
-  if (!isSupabaseConfigured) {
-    const customers = mockDb.getCustomers()
-    const page = options?.page ?? 1
-    const pageSize = options?.pageSize ?? PAGINATION.DEFAULT_PAGE_SIZE
-    const start = (page - 1) * pageSize
-    const paginatedCustomers = customers.slice(start, start + pageSize)
-    return { data: paginatedCustomers, count: customers.length }
-  }
+export type CustomerSortColumn =
+  | 'email'
+  | 'nb_looks'
+  | 'last_look_date'
+  | 'created_at'
 
-  const page = options?.page ?? 1
-  const pageSize = Math.min(options?.pageSize ?? PAGINATION.DEFAULT_PAGE_SIZE, PAGINATION.MAX_PAGE_SIZE)
+export interface FetchCustomersParams {
+  page?: number
+  pageSize?: number
+  search?: string
+  sortColumn?: CustomerSortColumn
+  sortDir?: 'asc' | 'desc'
+}
+
+export async function fetchCustomers(
+  params?: FetchCustomersParams
+): Promise<FetchCustomersResult> {
+  const page = params?.page ?? 1
+  const pageSize = Math.min(
+    params?.pageSize ?? PAGINATION.DEFAULT_PAGE_SIZE,
+    PAGINATION.MAX_PAGE_SIZE
+  )
+  const search = params?.search?.trim() ?? ''
+  const sortColumn = params?.sortColumn ?? 'created_at'
+  const sortDir = params?.sortDir ?? 'desc'
+
+  // Mock mode: search + sort client-side for parity.
+  if (!isSupabaseConfigured) {
+    let customers = mockDb.getCustomers()
+    if (search) {
+      const q = search.toLowerCase()
+      customers = customers.filter(
+        (c) =>
+          c.email.toLowerCase().includes(q) ||
+          (c.first_name ?? '').toLowerCase().includes(q) ||
+          (c.last_name ?? '').toLowerCase().includes(q)
+      )
+    }
+    const dir = sortDir === 'asc' ? 1 : -1
+    customers = [...customers].sort((a, b) => {
+      switch (sortColumn) {
+        case 'email':
+          return a.email.localeCompare(b.email) * dir
+        case 'nb_looks':
+          return (a.nb_looks - b.nb_looks) * dir
+        case 'last_look_date':
+          return ((a.last_look_date ?? '').localeCompare(b.last_look_date ?? '')) * dir
+        default:
+          return a.created_at.localeCompare(b.created_at) * -1
+      }
+    })
+    const start = (page - 1) * pageSize
+    return {
+      data: customers.slice(start, start + pageSize),
+      count: customers.length,
+    }
+  }
 
   const { data, error } = await supabase!.rpc(RPC_FUNCTIONS.GET_CUSTOMERS_WITH_STATS, {
     page_number: page,
     page_size: pageSize,
+    search: search || null,
+    sort_column: sortColumn,
+    sort_dir: sortDir,
   })
 
   if (error) {
@@ -161,10 +209,11 @@ export async function fetchCustomerStatistics(email: string): Promise<{ nbLooks:
     throw new Error(`Failed to fetch customer statistics: ${error.message}`)
   }
 
-  const looks = data ?? []
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // PostgREST returns the to-one `look` embed as an object at runtime, though
+  // the inferred Supabase type widens it to an array — bridge via `unknown`.
+  const looks = (data ?? []) as unknown as { look: { created_at: string } | null }[]
   const dates = looks
-    .map((l: any) => l.look?.created_at as string | undefined)
+    .map((l) => l.look?.created_at)
     .filter((d): d is string => Boolean(d))
     .sort()
     .reverse()
