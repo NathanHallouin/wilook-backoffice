@@ -1,7 +1,9 @@
-import { Suspense } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Suspense, useState } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { Navbar } from './Navbar'
+import { ShortcutsHelp } from './ShortcutsHelp'
 import { SnackbarContainer, DevBanner } from '@/components/ui'
+import { useGlobalShortcuts } from '@/hooks'
 
 function PageLoader() {
   return (
@@ -12,6 +14,14 @@ function PageLoader() {
 }
 
 export function Layout() {
+  const navigate = useNavigate()
+  const [helpOpen, setHelpOpen] = useState(false)
+
+  useGlobalShortcuts({
+    onNavigate: (path) => navigate(path),
+    onToggleHelp: () => setHelpOpen((v) => !v),
+  })
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -24,6 +34,7 @@ export function Layout() {
         </main>
       </div>
       <SnackbarContainer />
+      <ShortcutsHelp isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
   )
 }

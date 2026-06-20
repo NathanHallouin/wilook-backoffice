@@ -51,3 +51,17 @@ test('selects a product and reveals the bulk action bar', async ({ page }) => {
   await page.getByText('T-shirt Basic Noir').click()
   await expect(page.getByRole('button', { name: /Supprimer/ })).toBeVisible()
 })
+
+test('keyboard shortcuts navigate and open the help dialog', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible()
+
+  // "g" then "p" → Produits
+  await page.keyboard.press('g')
+  await page.keyboard.press('p')
+  await expect(page).toHaveURL(/\/products$/)
+
+  // "?" opens the shortcuts help
+  await page.keyboard.press('Shift+Slash')
+  await expect(page.getByRole('dialog', { name: 'Raccourcis clavier' })).toBeVisible()
+})
