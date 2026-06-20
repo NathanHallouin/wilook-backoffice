@@ -40,15 +40,18 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
 - **1.4 — Optimisation d'images** : util `processImage` (redimensionnement à
   `IMAGE_CONFIG.MAX_HEIGHT` + ré-encodage **WebP**, fallback sûr) branché sur les
   uploads produit et vignette de look.
-- **1.1 — Tests (en cours)** : Vitest + Testing Library + jsdom configurés ;
-  **47 tests** — utilitaires (`cn`, `processImage`, `getErrorMessage`), store
-  snackbar, composants (`Button`, `EmptyState`, `SelectionBar`), **hook**
-  `useSelection`, et **services en mode mock** : `products` (filtres + suppression
-  groupée), `looks` (filtres all/public/unused, create/bulk-delete), `customers`
-  (recherche, tri, CRUD) ; scripts `test` / `test:watch` / `test:coverage` ;
-  étape **Test** dans la CI.
-  *Reste* : e2e Playwright (parcours clés) et éventuellement les hooks data
-  (TanStack Query).
+- **1.1 — Tests** : Vitest + Testing Library + jsdom — **58 tests** :
+  utilitaires (`cn`, `processImage`, `getErrorMessage`), store snackbar,
+  composants (`Button`, `EmptyState`, `SelectionBar`, `Modal`, `Combobox`),
+  **hook** `useSelection`, **services en mode mock** (`products`/`looks`/
+  `customers` : filtres, recherche/tri, CRUD, suppression groupée). **e2e
+  Playwright** : config « démo » (`playwright.demo.config.ts`) qui lance l'app
+  Supabase désactivé → **4 specs** sans secret (dashboard sans login, parcours de
+  toutes les pages, drawer de filtres + Échap, sélection → barre d'actions),
+  vertes en Chromium. CI : étapes **Test** + nouveau job **e2e-demo** (installe
+  Chromium, lance les specs démo). Le smoke test authentifié (`smoke.spec.ts`)
+  reste dispo via `E2E_EMAIL`/`E2E_PASSWORD`.
+  *Reste (optionnel)* : tests des hooks data TanStack Query.
 - **1.6 — Code mort résolu** : les vues `providers`/`designers`/`univers` et les RPC
   `get_all_looks`/`get_nb_looks_users` (déclarées dans `constants.ts`) sont
   désormais **implémentées** dans `schema.sql` et **appliquées en base live**
@@ -79,6 +82,17 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
   survol **ou** clic droit) et **annuler** la composition (bouton « Annuler la
   composition » + `Ctrl/Cmd+Z`) via un historique des états de slots, réinitialisé
   au chargement d'un look. Filtres produits du builder branchés sur `formValues`.
+- **3.1 — a11y** : `Modal` accessible — `role="dialog"`, `aria-modal`,
+  `aria-labelledby` (titre), **focus-trap** (Tab/Shift+Tab cyclent), focus déplacé
+  dans la modale à l'ouverture et **restauré** à la fermeture, bouton de fermeture
+  labellisé, Échap. Profite aussi aux confirmations (`ConfirmDialog`). Drawer de
+  filtres : **Échap** pour fermer, `role="dialog"` + `aria-label`, backdrop
+  `aria-hidden`. **`Combobox`** : navigation clavier (`↑`/`↓`, `Entrée` pour
+  sélectionner/créer, `Échap` pour fermer, `Backspace` retire le dernier tag),
+  `role="combobox"`/`listbox`/`option` + `aria-expanded`/`aria-selected`. **Menus
+  de carte** (produits/looks) : `Échap` pour fermer, `aria-haspopup`/
+  `aria-expanded`, `role="menu"`/`menuitem`. Couvert par 11 tests (Modal +
+  Combobox). *Reste* : audit des contrastes (vérification visuelle).
 
 > **Hors-roadmap, en support des tests** : source de vérité typée des
 > vocabulaires produit (`src/config/formValues.ts` : catégories→types, couleurs,
