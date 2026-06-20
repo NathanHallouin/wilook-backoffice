@@ -12,6 +12,7 @@ A modern backoffice application for managing a fashion e-commerce business, buil
 - **Zustand** for lightweight state management
 - **Tailwind CSS** for styling
 - **Vite** as build tool
+- **Bun** as package manager and runtime
 - **Supabase** for backend (PostgreSQL + Auth + Storage)
 - **Heroicons** for icons
 
@@ -62,17 +63,16 @@ src/
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- npm or pnpm
+- [Bun](https://bun.sh) 1.0+
 
 ### Installation
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Start development server (works without Supabase in demo mode)
-npm run dev
+bun run dev
 ```
 
 ### With Supabase (optional)
@@ -83,19 +83,19 @@ cp .env.example .env
 
 # Add your Supabase credentials to .env
 # VITE_SUPABASE_URL=your-supabase-url
-# VITE_SUPABASE_ANON_KEY=your-anon-key
+# VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key
 
 # Restart the dev server
-npm run dev
+bun run dev
 ```
 
 ### Scripts
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run preview  # Preview production build
-npm run lint     # Run ESLint
+bun run dev      # Start development server
+bun run build    # Build for production
+bun run preview  # Preview production build
+bun run lint     # Run ESLint
 ```
 
 ## Best Practices Implemented
@@ -132,7 +132,7 @@ npm run lint     # Run ESLint
 | Variable | Description |
 |----------|-------------|
 | `VITE_SUPABASE_URL` | Your Supabase project URL (optional) |
-| `VITE_SUPABASE_ANON_KEY` | Your Supabase anonymous key (optional) |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Your Supabase publishable (anon) key (optional) |
 
 ## License
 
