@@ -1,6 +1,6 @@
 -- ============================================================================
 -- WILOOK Backoffice — sample seed data (optional)
--- Mirrors the demo-mode mock data. Run after schema.sql. Safe to re-run.
+-- Mirrors the demo-mode mock data. Run after the migration(s). Safe to re-run.
 -- ============================================================================
 
 -- Products (fixed UUIDs so looks can reference them)

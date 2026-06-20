@@ -92,11 +92,33 @@ bun run dev
 ### Scripts
 
 ```bash
-bun run dev      # Start development server
-bun run build    # Build for production
-bun run preview  # Preview production build
-bun run lint     # Run ESLint
+bun run dev            # Start development server
+bun run build          # Build for production
+bun run preview        # Preview production build
+bun run lint           # Run ESLint
+bun run test           # Unit tests (Vitest)
+bun run test:e2e:demo  # End-to-end tests in demo mode (Playwright)
 ```
+
+### Database (Supabase)
+
+Schema, migrations and seed data live in [`supabase/`](./supabase/) — see its
+[README](./supabase/README.md). In short: apply
+`supabase/migrations/` via the Supabase CLI (`supabase db push`) or by pasting
+the migration into the SQL Editor. Optional bulk test data:
+`supabase/seed_bulk.sql`.
+
+## Deployment
+
+The app is a static SPA — any static host works. Configure the two environment
+variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`) in the host's
+dashboard.
+
+- **Vercel** — zero-config via [`vercel.json`](./vercel.json): build `dist/`
+  with a SPA fallback so client-side routes resolve. Just import the repo and
+  add the env vars.
+- **Netlify / Cloudflare Pages** — build command `bun run build`, publish
+  `dist/`, and add a SPA fallback (`/* /index.html 200`).
 
 ## Best Practices Implemented
 

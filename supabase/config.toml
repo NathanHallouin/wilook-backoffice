@@ -1,0 +1,14 @@
+# Supabase CLI project config.
+# Link this directory to the hosted project, then push migrations:
+#   supabase link --project-ref erpmvjoqcgibojttzqdp
+#   supabase db push                 # apply migrations/ to the linked DB
+#   supabase db reset                # (local) recreate DB + run migrations + seed.sql
+project_id = "wilook-backoffice"
+
+[db]
+# Match the hosted Postgres major version.
+major_version = 15
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]

@@ -2,8 +2,8 @@
 -- WILOOK Backoffice — BULK test data generator
 -- ----------------------------------------------------------------------------
 -- Generates a large, varied dataset for load / UX testing: pagination,
--- infinite scroll, filters, search. Run in the Supabase SQL Editor AFTER
--- schema.sql (the editor runs as a superuser, so RLS does not block inserts).
+-- infinite scroll, filters, search. Run in the Supabase SQL Editor AFTER the
+-- migration(s) (the editor runs as a superuser, so RLS does not block inserts).
 --
 -- Volumes: edit the three generate_series(1, N) calls below.
 --   products  : 500
