@@ -1,0 +1,116 @@
+# Roadmap — WILOOK Backoffice
+
+Feuille de route des améliorations, classée par priorité. Chaque item est ancré
+sur l'état actuel du code. Tailles indicatives : **S** (≤ ½ j), **M** (1–3 j),
+**L** (≥ 1 sem).
+
+Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
+
+> **Cible : poste de travail (desktop) uniquement.** Le responsive mobile n'est
+> pas un objectif — les items spécifiques au mobile sont volontairement écartés.
+
+### ✅ Déjà livré (20/06/2026)
+
+- **0.1 — Authentification** : Supabase Auth **email + mot de passe**.
+  `AuthProvider` + `useAuth`, garde de routes `RequireAuth` (redirige vers
+  `/login`), page `/login`, bouton **Déconnexion** câblé. Pas d'inscription
+  publique (comptes créés à la main). Mode démo (sans Supabase) : auth bypassée.
+  Un compte de test a été créé (identifiants communiqués hors-repo, **à changer**).
+- **0.2 — Verrouillage RLS** : policies passées de `anon` à **`authenticated`**
+  seul (tables + storage). Vérifié : anon = 0 ligne, authentifié = 5.
+  `schema.sql` aligné. Images publiques toujours servies (buckets publics).
+
+- **0.4 — ESLint** : 0 erreur (`bun run lint` vert). Effets de hydratation de
+  formulaire (ProductEdit/LookEdit) refactorés en pattern « render-time guardé » ;
+  `Products` migré vers `useInfiniteQuery` (plus d'accumulation manuelle ni
+  d'effets) ; `any` typé dans `customers.ts`.
+- **1.2 — Code-splitting** : routes en `React.lazy` + `Suspense` (sidebar
+  persistante). Bundle principal 576 → 515 kB, chaque page dans son chunk.
+- **1.3 — Error boundary** : `ErrorBoundary` global avec écran de secours.
+- **2.2 — Confirmation de suppression** : `ConfirmProvider` + `useConfirm()`
+  (promesse), câblé sur produits/looks.
+- **3.3 — Toasts** : auto-dismiss (déjà présent) + plafond à 4 messages.
+- **4.1 — CI** : GitHub Actions (`bun install` + lint + build) sur push/PR.
+- **0.5 — Validation des formulaires** : ProductEdit valide titre/type/prix et
+  prix promo < prix (messages via le prop `error` de `Input`).
+- **2.1 — Pagination & recherche serveur** : `Looks` passé en infinite scroll
+  (`useInfiniteLooks`) ; `Users` recherche (débouncée) + tri **résolus côté
+  Supabase** — RPC `get_customers_with_stats` enrichie (`search`, `sort_column`,
+  `sort_dir`), `schema.sql` mis à jour et appliqué en base.
+- **1.4 — Optimisation d'images** : util `processImage` (redimensionnement à
+  `IMAGE_CONFIG.MAX_HEIGHT` + ré-encodage **WebP**, fallback sûr) branché sur les
+  uploads produit et vignette de look.
+- **1.1 — Tests (amorcé)** : Vitest + Testing Library + jsdom configurés ;
+  **15 tests** (`cn`, `processImage`, store snackbar, `Button`, `EmptyState`) ;
+  scripts `test` / `test:watch` / `test:coverage` ; étape **Test** ajoutée à la CI.
+  *Reste* : tests des hooks/services et e2e Playwright.
+
+---
+
+## Phase 0 — Sécurité & correctness (avant toute mise en prod)
+
+| # | Item | Pourquoi | Taille | Prio |
+|---|------|----------|--------|------|
+| 0.1 | **Authentification** | Le bouton « Déconnexion » (`Navbar.tsx`) est inerte ; il n'existe aucune page de login. N'importe qui ayant l'URL accède au backoffice. Ajouter Supabase Auth (email magic-link ou password), une route `/login`, un guard de routes, et brancher le logout. | M | 🔴 |
+| 0.2 | **Verrouiller les RLS** | `supabase/schema.sql` ouvre l'accès `anon` complet (lecture/écriture) sur toutes les tables et buckets. À restreindre aux utilisateurs authentifiés (rôle `authenticated`) une fois 0.1 en place, idéalement avec un rôle « admin/staff ». | S | 🔴 |
+| 0.3 | **Roter le mot de passe DB** | Le mot de passe Postgres a transité en clair pendant le setup. À régénérer (Settings → Database → Reset password). | S | 🔴 |
+| 0.4 | **Corriger les 8 erreurs ESLint** | `bun run lint` échoue (8 erreurs préexistantes). Bloque tout futur gating CI. | S | 🟠 |
+| 0.5 | **Validation des formulaires** | `ProductEdit`/`LookEdit` n'ont pas de validation (prix négatif, titre vide hors `required` natif, `final_price > price`…). Ajouter une validation (zod) + messages d'erreur via le prop `error` déjà présent sur `Input`. | M | 🟠 |
+
+---
+
+## Phase 1 — Fondations & qualité
+
+| # | Item | Pourquoi | Taille | Prio |
+|---|------|----------|--------|------|
+| 1.1 | **Tests** | Aucun test dans le repo. Mettre en place Vitest + Testing Library (composants UI, hooks de données) et quelques tests e2e Playwright (déjà dispo en local) sur les parcours clés. | L | 🟠 |
+| 1.2 | **Code-splitting / lazy routes** | Bundle JS unique de ~576 kB (warning Vite). Le README annonce du « lazy loading » non implémenté. Passer les routes en `React.lazy` + `Suspense`. | S | 🟠 |
+| 1.3 | **Error boundaries** | Une erreur de rendu casse toute l'app (écran blanc). Ajouter un `ErrorBoundary` global + un fallback par route. | S | 🟠 |
+| 1.4 | **Optimisation d'images à l'upload** | `IMAGE_CONFIG` (resize, WebP, thumbnail) est défini dans `constants.ts` mais **non utilisé** : `UploadImages` envoie les fichiers bruts. Générer une miniature + conversion WebP côté client avant upload. | M | 🟠 |
+| 1.5 | **Gestion d'erreurs réseau** | Les services lèvent des `Error` génériques, l'UI affiche « Une erreur est survenue ». Surfacer le vrai message et distinguer les états erreur / retry / vide (les hooks TanStack Query exposent déjà `error`). | S | 🟡 |
+| 1.6 | **Nettoyer le code mort** | `RPC_FUNCTIONS.GET_ALL_LOOKS`, `GET_NB_LOOKS_USERS` et les vues `providers`/`designers`/`univers` sont déclarés mais jamais utilisés (ni créés en base). Décider : implémenter ou supprimer. | S | 🟡 |
+
+---
+
+## Phase 2 — Ergonomie & fonctionnalités
+
+| # | Item | Pourquoi | Taille | Prio |
+|---|------|----------|--------|------|
+| 2.1 | **Pagination Looks & recherche serveur Users** | `Looks` ne charge que la page 1 (pas de « charger plus »). `Users` trie/filtre **uniquement la page déjà chargée** (tri & recherche client-side) → résultats incomplets au-delà de la 1ʳᵉ page. Passer tri/recherche/pagination côté Supabase (RPC ou query). | M | 🟠 |
+| 2.2 | **Confirmation de suppression** | Les suppressions (produit/look) sont immédiates, sans confirmation. Ajouter une `Modal` de confirmation (le composant existe déjà). | S | 🟠 |
+| 2.3 | **Actions groupées** | Pas de sélection multiple. Permettre suppression/édition en masse de produits/looks (souris + raccourcis clavier). | M | 🟡 |
+| 2.4 | **Look builder** | Le drag-and-drop n'a pas de « vider un slot » ni d'annulation. Améliorer l'ergonomie de composition (clic-droit, raccourcis). | M | 🟡 |
+| 2.5 | **Hauteur des cartes Looks** | `h-look` fixe laisse un vide sous le texte quand le contenu est court. Passer à une hauteur intrinsèque ou remplir l'espace (ex : aperçu produits). | S | 🟡 |
+| 2.6 | **Filtres produits : tailles & promo** | Le drawer filtre catégorie/type/marque/couleur/matière/prix mais pas les tailles ni « en promo ». Compléter. | S | 🟡 |
+| 2.7 | **Raccourcis clavier** | Backoffice desktop : gagner en productivité avec des raccourcis (recherche `/`, nouveau produit, navigation). | M | 🟢 |
+
+---
+
+## Phase 3 — Polish & accessibilité
+
+| # | Item | Pourquoi | Taille | Prio |
+|---|------|----------|--------|------|
+| 3.1 | **Audit a11y** | Vérifier focus-trap des `Modal`/drawer, rôles ARIA, navigation clavier des menus de carte et du combobox, contrastes. | M | 🟡 |
+| 3.2 | **Mode sombre** | Les tokens de design (`@theme` dans `index.css`) facilitent un thème sombre via variables CSS. | M | 🟢 |
+| 3.3 | **Toasts : auto-dismiss & file** | Les snackbars ne se ferment pas seuls et s'empilent sans limite. Ajouter un timeout + cap. | S | 🟡 |
+| 3.4 | **Favicon & branding** | Vérifier `favicon.svg`, ajouter une vraie identité WILOOK (couleurs déjà posées). | S | 🟢 |
+
+---
+
+## Phase 4 — Infra & DevOps
+
+| # | Item | Pourquoi | Taille | Prio |
+|---|------|----------|--------|------|
+| 4.1 | **CI** | Pipeline (GitHub Actions) : `bun install`, `bun run lint`, `bun run build`, tests. Bloquer les merges en échec. | S | 🟠 |
+| 4.2 | **Migrations versionnées** | Le schéma vit dans `supabase/schema.sql` (appliqué à la main). Passer à des migrations versionnées (Supabase CLI) pour la reproductibilité. | M | 🟡 |
+| 4.3 | **Déploiement** | Pas de cible de déploiement. Configurer un hébergeur (Vercel/Netlify/Cloudflare) avec les variables d'env. | S | 🟡 |
+
+---
+
+## Ordre conseillé
+
+1. **0.1 → 0.4** (sécurité : sans ça, pas de prod possible)
+2. **1.2, 1.3, 4.1** (quick wins qualité : split, error boundary, CI)
+3. **2.1, 2.2** (les manques fonctionnels les plus visibles : pagination/recherche serveur, confirmation de suppression)
+4. **1.1, 1.4** (tests + images)
+5. Le reste au fil de l'eau.
