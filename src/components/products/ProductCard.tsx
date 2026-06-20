@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   EllipsisVerticalIcon,
@@ -37,6 +37,16 @@ export function ProductCard({
 }: ProductCardProps) {
   const navigate = useNavigate()
   const [showMenu, setShowMenu] = useState(false)
+
+  // Close the actions menu on Escape.
+  useEffect(() => {
+    if (!showMenu) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowMenu(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showMenu])
 
   const handleEdit = () => {
     navigate(`/products/edit?id=${product.id}`)
@@ -168,6 +178,9 @@ export function ProductCard({
             e.stopPropagation()
             setShowMenu((s) => !s)
           }}
+          aria-label="Actions du produit"
+          aria-haspopup="true"
+          aria-expanded={showMenu}
           className={cn(
             'rounded-full bg-white/90 p-1.5 text-gray-600 shadow-sm ring-1 ring-gray-200 backdrop-blur transition',
             'hover:bg-white hover:text-gray-900',
@@ -186,8 +199,12 @@ export function ProductCard({
                 setShowMenu(false)
               }}
             />
-            <div className="shadow-pop absolute right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border border-gray-100 bg-white py-1">
+            <div
+              role="menu"
+              className="shadow-pop absolute right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border border-gray-100 bg-white py-1"
+            >
               <button
+                role="menuitem"
                 onClick={handleEdit}
                 className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
               >
@@ -195,6 +212,7 @@ export function ProductCard({
                 Modifier
               </button>
               <button
+                role="menuitem"
                 onClick={handleDelete}
                 className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
               >

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { cn } from '@/utils/cn'
 import { Accordion, Checkbox, Input } from '@/components/ui'
@@ -57,6 +58,16 @@ export function ProductFiltersDrawer({
     })
   }
 
+  // Accessibility: Escape closes the drawer.
+  useEffect(() => {
+    if (!isOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen, onClose])
+
   return (
     <>
       {/* Backdrop */}
@@ -64,11 +75,15 @@ export function ProductFiltersDrawer({
         <div
           className="animate-fade-in fixed inset-0 z-40 bg-gray-900/30 backdrop-blur-sm"
           onClick={onClose}
+          aria-hidden="true"
         />
       )}
 
       {/* Drawer */}
       <div
+        role="dialog"
+        aria-label="Filtres produits"
+        aria-hidden={!isOpen}
         className={cn(
           'shadow-pop fixed right-0 top-0 z-50 h-full w-80 border-l border-gray-200 bg-white',
           'transform transition-transform duration-300 ease-out',
@@ -81,6 +96,7 @@ export function ProductFiltersDrawer({
           </h2>
           <button
             onClick={onClose}
+            aria-label="Fermer les filtres"
             className="-mr-1 rounded-lg p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
           >
             <XMarkIcon className="h-5 w-5" />
