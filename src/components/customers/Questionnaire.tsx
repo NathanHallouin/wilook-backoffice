@@ -8,7 +8,7 @@ export function Questionnaire({ customer }: QuestionnaireProps) {
   const { questionnaire_data, sizes, budget, style_preferences } = customer
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6">
+    <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-6">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
         Questionnaire
       </h2>

@@ -72,7 +72,7 @@ export function UserProfilePage() {
 
       <div className="p-6 space-y-6">
         {/* Customer info header */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-card">
+        <div className="rounded-2xl border border-gray-200 bg-surface p-6 shadow-card">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex items-center gap-4">
               <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 text-lg font-semibold text-brand-700">
@@ -102,7 +102,7 @@ export function UserProfilePage() {
         <Questionnaire customer={customer} />
 
         {/* Looks */}
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6">
+        <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Looks ({looks.length})
           </h2>

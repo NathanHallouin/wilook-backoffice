@@ -7,7 +7,7 @@ interface CustomerInfoProps {
 
 export function CustomerInfo({ customer }: CustomerInfoProps) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-4">
+    <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-4">
       <h3 className="text-sm font-medium text-gray-700 mb-3">Informations client</h3>
 
       <div className="space-y-3">

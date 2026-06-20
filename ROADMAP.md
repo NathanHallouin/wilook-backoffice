@@ -111,6 +111,15 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
   WILOOK multicolore (conservé tel quel). `index.html` complété : `description`,
   Open Graph (`og:title`/`description`/`type`/`locale`), `application-name`,
   `apple-touch-icon`. (`lang="fr"`, `theme-color` et `<title>` déjà en place.)
+- **3.2 — Mode sombre** : thème sombre via inversion de la rampe de gris + token
+  `--color-surface` sous la classe `.dark` (les utilitaires `bg-gray/text-gray/
+  border-gray` flippent automatiquement ; `bg-white` → `bg-surface` partout,
+  `text-white` intact). Store `useThemeStore` (clair / sombre / **système**),
+  persistance `localStorage`, application avant le 1ᵉʳ paint + suivi des
+  changements OS ; **bouton bascule** (lune/soleil) dans la navbar. Overlays
+  passés en `bg-black/*`, shimmer du skeleton atténué. **Vérifié visuellement**
+  (captures Playwright : dashboard, produits, drawer — clair & sombre) + 3 tests
+  sur le store. *Reste* : audit fin des contrastes.
 
 > **Hors-roadmap, en support des tests** : source de vérité typée des
 > vocabulaires produit (`src/config/formValues.ts` : catégories→types, couleurs,

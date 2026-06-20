@@ -25,7 +25,7 @@ function StatCard({ title, value, icon: Icon, href, accent }: StatCardProps) {
   return (
     <button
       onClick={() => navigate(href)}
-      className="group w-full rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover"
+      className="group w-full rounded-2xl border border-gray-200 bg-surface p-5 text-left shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover"
     >
       <div className="flex items-start justify-between">
         <div className={cn('flex h-11 w-11 items-center justify-center rounded-xl', accent)}>
@@ -83,8 +83,8 @@ export function DashboardPage() {
 
         {/* Hero */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 p-8 text-white sm:p-10">
-          <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/10" />
-          <div className="pointer-events-none absolute -bottom-16 right-24 h-40 w-40 rounded-full bg-white/5" />
+          <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-surface/10" />
+          <div className="pointer-events-none absolute -bottom-16 right-24 h-40 w-40 rounded-full bg-surface/5" />
           <div className="relative max-w-xl">
             <h2 className="text-2xl font-bold tracking-tight">
               Bienvenue sur WILOOK
@@ -103,7 +103,7 @@ export function DashboardPage() {
               </Button>
               <button
                 onClick={() => navigate('/looks/edit')}
-                className="inline-flex items-center rounded-lg bg-white/15 px-4 py-2 text-sm font-medium text-white ring-1 ring-inset ring-white/25 backdrop-blur transition-colors hover:bg-white/25"
+                className="inline-flex items-center rounded-lg bg-surface/15 px-4 py-2 text-sm font-medium text-white ring-1 ring-inset ring-white/25 backdrop-blur transition-colors hover:bg-surface/25"
               >
                 <SparklesIcon className="mr-2 h-5 w-5" />
                 Créer un look

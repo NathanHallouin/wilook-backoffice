@@ -73,7 +73,7 @@ export function ProductFiltersDrawer({
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="animate-fade-in fixed inset-0 z-40 bg-gray-900/30 backdrop-blur-sm"
+          className="animate-fade-in fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -85,7 +85,7 @@ export function ProductFiltersDrawer({
         aria-label="Filtres produits"
         aria-hidden={!isOpen}
         className={cn(
-          'shadow-pop fixed right-0 top-0 z-50 h-full w-80 border-l border-gray-200 bg-white',
+          'shadow-pop fixed right-0 top-0 z-50 h-full w-80 border-l border-gray-200 bg-surface',
           'transform transition-transform duration-300 ease-out',
           isOpen ? 'translate-x-0' : 'translate-x-full'
         )}

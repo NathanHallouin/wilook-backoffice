@@ -84,7 +84,7 @@ export function UsersPage() {
             description="Aucun client ne correspond à votre recherche."
           />
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card">
+          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-surface shadow-card">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50/80">
                 <tr>
@@ -114,7 +114,7 @@ export function UsersPage() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 bg-white">
+              <tbody className="divide-y divide-gray-100 bg-surface">
                 {isLoading
                   ? Array.from({ length: 6 }).map((_, i) => (
                       <tr key={i}>

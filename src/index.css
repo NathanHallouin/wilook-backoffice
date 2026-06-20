@@ -18,10 +18,51 @@
   --color-brand-800: #4c36a6;
   --color-brand-900: #413084;
 
+  /* Elevated surface (cards, navbar, inputs, popovers). Light by default,
+     overridden in dark mode — used via `bg-surface`. */
+  --color-surface: #ffffff;
+
   /* Soft, layered shadows for a lighter, more premium feel */
   --shadow-card: 0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 3px 0 rgb(16 24 40 / 0.06);
   --shadow-card-hover: 0 8px 24px -6px rgb(16 24 40 / 0.12), 0 2px 6px -2px rgb(16 24 40 / 0.08);
   --shadow-pop: 0 12px 32px -8px rgb(16 24 40 / 0.18);
+}
+
+/* ----------------------------------------------------------------------------
+   Dark theme — overrides the gray ramp + surface so existing
+   bg-gray/text-gray/border-gray/bg-surface utilities flip automatically.
+   Activated by the `dark` class on <html> (see src/stores/theme.ts).
+---------------------------------------------------------------------------- */
+.dark {
+  color-scheme: dark;
+
+  --color-surface: #1a1d24;
+
+  /* Inverted neutral ramp (50 = darkest canvas → 900/950 = lightest ink). */
+  --color-gray-50: #0d0f14;
+  --color-gray-100: #171a21;
+  --color-gray-200: #262b36;
+  --color-gray-300: #353b49;
+  --color-gray-400: #565d6d;
+  --color-gray-500: #8b92a1;
+  --color-gray-600: #aab1bf;
+  --color-gray-700: #c8cdd7;
+  --color-gray-800: #e2e5ea;
+  --color-gray-900: #f3f4f6;
+  --color-gray-950: #fbfbfc;
+
+  /* Brand tints used for selected chips/options need to read on dark. */
+  --color-brand-50: #221c52;
+  --color-brand-100: #2c2566;
+  --color-brand-700: #c0bbfc;
+  --color-brand-800: #dbd9fe;
+
+  /* Subtle red wash for destructive hovers. */
+  --color-red-50: #3a1418;
+
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.4), 0 1px 3px 0 rgb(0 0 0 / 0.5);
+  --shadow-card-hover: 0 8px 24px -6px rgb(0 0 0 / 0.55), 0 2px 6px -2px rgb(0 0 0 / 0.5);
+  --shadow-pop: 0 12px 32px -8px rgb(0 0 0 / 0.6);
 }
 
 /* ----------------------------------------------------------------------------
@@ -101,6 +142,14 @@ body {
     transparent
   );
   animation: shimmer 1.5s infinite;
+}
+.dark .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.06),
+    transparent
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {

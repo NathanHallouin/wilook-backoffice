@@ -199,7 +199,7 @@ export function ProductEditPage() {
       <form onSubmit={handleSubmit} className="p-6 max-w-4xl">
         <div className="space-y-6">
           {/* Basic info */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6 space-y-4">
+          <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-6 space-y-4">
             <h2 className="text-base font-semibold text-gray-900">Informations générales</h2>
 
             <Input
@@ -283,7 +283,7 @@ export function ProductEditPage() {
           </div>
 
           {/* Attributes */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6 space-y-4">
+          <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-6 space-y-4">
             <h2 className="text-base font-semibold text-gray-900">Attributs</h2>
 
             <Combobox
@@ -330,7 +330,7 @@ export function ProductEditPage() {
           </div>
 
           {/* Price */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6 space-y-4">
+          <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-6 space-y-4">
             <h2 className="text-base font-semibold text-gray-900">Prix</h2>
 
             <div className="grid grid-cols-2 gap-4">
@@ -363,7 +363,7 @@ export function ProductEditPage() {
           </div>
 
           {/* Images */}
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-6 space-y-4">
+          <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-6 space-y-4">
             <h2 className="text-base font-semibold text-gray-900">Images</h2>
             <UploadImages
               images={formData.images}

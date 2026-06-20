@@ -48,7 +48,7 @@ export function LoginPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-card"
+          className="space-y-4 rounded-2xl border border-gray-200 bg-surface p-6 shadow-card"
         >
           <Input
             label="Email"

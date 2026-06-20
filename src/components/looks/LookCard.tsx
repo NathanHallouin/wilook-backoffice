@@ -59,7 +59,7 @@ export function LookCard({
   return (
     <div
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover',
+        'group relative flex flex-col overflow-hidden rounded-2xl border bg-surface shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover',
         selected ? 'border-brand-500 ring-2 ring-brand-500' : 'border-gray-200',
         selectable && 'cursor-pointer'
       )}
@@ -79,7 +79,7 @@ export function LookCard({
             'absolute left-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-md border-2 backdrop-blur transition',
             selected
               ? 'border-brand-600 bg-brand-600 text-white opacity-100'
-              : 'border-gray-300 bg-white/90 text-transparent opacity-0 group-hover:opacity-100'
+              : 'border-gray-300 bg-surface/90 text-transparent opacity-0 group-hover:opacity-100'
           )}
         >
           <CheckIcon className="h-4 w-4" strokeWidth={3} />
@@ -146,8 +146,8 @@ export function LookCard({
           aria-haspopup="true"
           aria-expanded={showMenu}
           className={cn(
-            'rounded-full bg-white/90 p-1.5 text-gray-600 shadow-sm ring-1 ring-gray-200 backdrop-blur transition',
-            'hover:bg-white hover:text-gray-900',
+            'rounded-full bg-surface/90 p-1.5 text-gray-600 shadow-sm ring-1 ring-gray-200 backdrop-blur transition',
+            'hover:bg-surface hover:text-gray-900',
             showMenu ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
           )}
         >
@@ -165,7 +165,7 @@ export function LookCard({
             />
             <div
               role="menu"
-              className="shadow-pop absolute right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border border-gray-100 bg-white py-1"
+              className="shadow-pop absolute right-0 z-20 mt-1 w-36 overflow-hidden rounded-xl border border-gray-100 bg-surface py-1"
             >
               <button
                 role="menuitem"

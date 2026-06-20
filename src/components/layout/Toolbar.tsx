@@ -8,7 +8,7 @@ interface ToolbarProps {
 
 export function Toolbar({ title, subtitle, children }: ToolbarProps) {
   return (
-    <div className="sticky top-0 z-40 border-b border-gray-200 bg-white/80 px-6 py-4 backdrop-blur-md">
+    <div className="sticky top-0 z-40 border-b border-gray-200 bg-surface/80 px-6 py-4 backdrop-blur-md">
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
           <h1 className="truncate text-xl font-semibold tracking-tight text-gray-900">

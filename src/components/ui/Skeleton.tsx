@@ -12,7 +12,7 @@ export function Skeleton({ className }: SkeletonProps) {
 /** Product/look card placeholder used in grids while data loads. */
 export function CardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-surface">
       <Skeleton className="aspect-square rounded-none" />
       <div className="space-y-2 p-3">
         <Skeleton className="h-3 w-1/2" />

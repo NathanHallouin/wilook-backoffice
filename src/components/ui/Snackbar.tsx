@@ -35,7 +35,7 @@ export function SnackbarContainer() {
         return (
           <div
             key={message.id}
-            className="shadow-pop animate-rise-in flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3"
+            className="shadow-pop animate-rise-in flex items-center gap-3 rounded-xl border border-gray-200 bg-surface px-4 py-3"
           >
             <Icon className={cn('h-5 w-5 flex-shrink-0', iconColors[message.type])} />
             <p className="flex-1 text-sm font-medium text-gray-800">

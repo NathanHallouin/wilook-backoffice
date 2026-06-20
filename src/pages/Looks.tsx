@@ -138,7 +138,7 @@ export function LooksPage() {
               className={cn(
                 'rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors',
                 activeTab === tab.value
-                  ? 'bg-white text-gray-900 shadow-sm'
+                  ? 'bg-surface text-gray-900 shadow-sm'
                   : 'text-gray-500 hover:text-gray-800'
               )}
             >

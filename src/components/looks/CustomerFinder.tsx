@@ -15,7 +15,7 @@ export function CustomerFinder({ onSelect, selectedEmail }: CustomerFinderProps)
   const { data: results = [], isLoading } = useSearchCustomers(search)
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-4">
+    <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-4">
       <h3 className="text-sm font-medium text-gray-700 mb-3">Rechercher un client</h3>
 
       <div className="relative">

@@ -93,7 +93,7 @@ export function Modal({
       <div className="flex min-h-full items-center justify-center p-4">
         {/* Backdrop */}
         <div
-          className="animate-fade-in fixed inset-0 bg-gray-900/40 backdrop-blur-sm"
+          className="animate-fade-in fixed inset-0 bg-black/50 backdrop-blur-sm"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -106,7 +106,7 @@ export function Modal({
           aria-labelledby={title ? titleId : undefined}
           tabIndex={-1}
           className={cn(
-            'animate-rise-in shadow-pop relative w-full rounded-2xl bg-white focus:outline-none',
+            'animate-rise-in shadow-pop relative w-full rounded-2xl bg-surface focus:outline-none',
             sizeClasses[size]
           )}
         >

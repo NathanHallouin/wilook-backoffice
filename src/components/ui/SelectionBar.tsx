@@ -31,7 +31,7 @@ export function SelectionBar({
 
   return (
     <div className="animate-fade-in fixed bottom-6 left-1/2 z-40 -translate-x-1/2">
-      <div className="shadow-pop flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-3 py-2">
+      <div className="shadow-pop flex items-center gap-3 rounded-2xl border border-gray-200 bg-surface px-3 py-2">
         <button
           onClick={onClear}
           className="rounded-lg p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"

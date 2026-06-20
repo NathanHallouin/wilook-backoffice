@@ -5,10 +5,13 @@ import {
   ShoppingBagIcon,
   UsersIcon,
   ArrowRightOnRectangleIcon,
+  MoonIcon,
+  SunIcon,
 } from '@heroicons/react/24/outline'
 import { cn } from '@/utils/cn'
 import { ROUTES } from '@/config/constants'
 import { useAuth } from '@/components/auth/AuthProvider'
+import { useThemeStore } from '@/stores'
 
 const navItems = [
   { to: ROUTES.HOME, icon: Squares2X2Icon, label: 'Tableau de bord', end: true },
@@ -20,6 +23,8 @@ const navItems = [
 export function Navbar() {
   const navigate = useNavigate()
   const { signOut } = useAuth()
+  const resolvedDark = useThemeStore((s) => s.resolvedDark)
+  const toggleTheme = useThemeStore((s) => s.toggle)
 
   const handleLogout = async () => {
     await signOut()
@@ -27,7 +32,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="fixed left-0 top-0 z-100 flex h-full w-60 flex-col border-r border-gray-200 bg-white px-3 py-4">
+    <nav className="fixed left-0 top-0 z-100 flex h-full w-60 flex-col border-r border-gray-200 bg-surface px-3 py-4">
       {/* Brand */}
       <NavLink
         to={ROUTES.HOME}
@@ -73,6 +78,20 @@ export function Navbar() {
           </NavLink>
         ))}
       </div>
+
+      {/* Theme toggle */}
+      <button
+        onClick={toggleTheme}
+        aria-label={resolvedDark ? 'Passer en thème clair' : 'Passer en thème sombre'}
+        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+      >
+        {resolvedDark ? (
+          <SunIcon className="h-5 w-5 flex-shrink-0" />
+        ) : (
+          <MoonIcon className="h-5 w-5 flex-shrink-0" />
+        )}
+        <span>{resolvedDark ? 'Thème clair' : 'Thème sombre'}</span>
+      </button>
 
       {/* Logout */}
       <button
