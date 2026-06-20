@@ -37,7 +37,7 @@ export function LookCard({ look, onDelete }: LookCardProps) {
     look.right_bottom
 
   return (
-    <div className="group relative flex h-look flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
       {/* Preview */}
       <div className="relative h-48 overflow-hidden bg-gray-100">
         {look.thumbnail ? (
@@ -69,7 +69,7 @@ export function LookCard({ look, onDelete }: LookCardProps) {
       </div>
 
       {/* Info */}
-      <div className="flex flex-1 flex-col p-3">
+      <div className="flex flex-col p-3">
         <p className="truncate text-sm font-semibold text-gray-900">
           {look.name || 'Sans nom'}
         </p>
@@ -78,7 +78,7 @@ export function LookCard({ look, onDelete }: LookCardProps) {
         )}
 
         {(look.customers_count ?? 0) > 0 && (
-          <div className="mt-auto flex items-center gap-1.5 pt-2 text-xs text-gray-500">
+          <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
             <UsersIcon className="h-4 w-4" />
             <span>
               {look.customers_count} client{(look.customers_count ?? 0) > 1 ? 's' : ''}

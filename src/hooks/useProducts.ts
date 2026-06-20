@@ -92,6 +92,14 @@ export function useBrands() {
   })
 }
 
+export function useProviders() {
+  return useQuery({
+    queryKey: ['providers'],
+    queryFn: productsService.fetchProviders,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
 export function useProductTypes() {
   return useQuery({
     queryKey: ['productTypes'],

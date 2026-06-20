@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { PlusIcon, SparklesIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, SparklesIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Toolbar } from '@/components/layout'
 import { Button, CardGridSkeleton, EmptyState, useConfirm } from '@/components/ui'
 import { LookCard } from '@/components/looks'
 import { useInfiniteLooks, useDeleteLook } from '@/hooks'
 import { useSnackbarStore } from '@/stores'
 import { cn } from '@/utils/cn'
+import { getErrorMessage } from '@/utils/error'
 import type { LookFilter } from '@/services/looks'
 
 const tabs: { value: LookFilter; label: string }[] = [
@@ -20,8 +21,16 @@ export function LooksPage() {
   const { success, error: showError } = useSnackbarStore()
 
   const [activeTab, setActiveTab] = useState<LookFilter>('all')
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteLooks(activeTab)
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteLooks(activeTab)
   const deleteLook = useDeleteLook()
   const confirm = useConfirm()
 
@@ -55,8 +64,8 @@ export function LooksPage() {
     try {
       await deleteLook.mutateAsync(id)
       success('Look supprimé')
-    } catch {
-      showError('Erreur lors de la suppression')
+    } catch (err) {
+      showError(getErrorMessage(err, 'Erreur lors de la suppression'))
     }
   }
 
@@ -95,6 +104,13 @@ export function LooksPage() {
 
         {isLoading && allLooks.length === 0 ? (
           <CardGridSkeleton count={10} />
+        ) : isError && allLooks.length === 0 ? (
+          <EmptyState
+            icon={ExclamationTriangleIcon}
+            title="Impossible de charger les looks"
+            description={getErrorMessage(error)}
+            action={<Button onClick={() => refetch()}>Réessayer</Button>}
+          />
         ) : allLooks.length === 0 ? (
           <EmptyState
             icon={SparklesIcon}
@@ -109,7 +125,7 @@ export function LooksPage() {
           />
         ) : (
           <>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {allLooks.map((look) => (
                 <LookCard key={look.id} look={look} onDelete={handleDelete} />
               ))}

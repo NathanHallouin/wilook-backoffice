@@ -78,10 +78,22 @@ create index if not exists idx_products_category    on public.products(category)
 create index if not exists idx_looks_is_public      on public.looks(is_public);
 
 -- ----------------------------------------------------------------------------
--- View: distinct brands (queried as .from('brands').select('brand'))
+-- Views: distinct value lists, used to populate filter / form dropdowns.
+-- One view per VIEWS entry in src/config/constants.ts. Each is queried as
+-- .from('<view>').select('<column>'), so the column name must match the table.
 -- ----------------------------------------------------------------------------
 create or replace view public.brands as
   select distinct brand from public.products where brand is not null;
+
+create or replace view public.providers as
+  select distinct provider from public.products where provider is not null;
+
+-- designer / universe live on `looks` in this project (not on products).
+create or replace view public.designers as
+  select distinct designer from public.looks where designer is not null;
+
+create or replace view public.univers as
+  select distinct universe from public.looks where universe is not null;
 
 -- ----------------------------------------------------------------------------
 -- RPC functions
@@ -154,6 +166,37 @@ as $$
     select 1 from public.looks_profiles lp where lp.look_id = l.id
   )
   order by l.created_at desc;
+$$;
+
+-- get_all_looks(): every look, newest first. The app usually fetches looks via
+-- PostgREST embeds (src/services/looks.ts); this RPC exists for parity with the
+-- RPC_FUNCTIONS surface declared in src/config/constants.ts.
+create or replace function public.get_all_looks()
+returns setof public.looks
+language sql
+stable
+as $$
+  select l.* from public.looks l order by l.created_at desc;
+$$;
+
+-- get_nb_looks_users(): per-customer look stats (count + last assignment date).
+create or replace function public.get_nb_looks_users()
+returns table (
+  email          text,
+  nb_looks       bigint,
+  last_look_date timestamptz
+)
+language sql
+stable
+as $$
+  select
+    p.email,
+    count(lp.look_id) as nb_looks,
+    max(l.created_at) as last_look_date
+  from public.profiles p
+  left join public.looks_profiles lp on lp.profile_email = p.email
+  left join public.looks l          on l.id = lp.look_id
+  group by p.email;
 $$;
 
 -- ----------------------------------------------------------------------------

@@ -44,6 +44,32 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
   **15 tests** (`cn`, `processImage`, store snackbar, `Button`, `EmptyState`) ;
   scripts `test` / `test:watch` / `test:coverage` ; étape **Test** ajoutée à la CI.
   *Reste* : tests des hooks/services et e2e Playwright.
+- **1.6 — Code mort résolu** : les vues `providers`/`designers`/`univers` et les RPC
+  `get_all_looks`/`get_nb_looks_users` (déclarées dans `constants.ts`) sont
+  désormais **implémentées** dans `schema.sql` et **appliquées en base live**
+  (grants `authenticated` vérifiés). Service `fetchProviders` + hook `useProviders`
+  branchés sur le formulaire produit (champ Fournisseur).
+- **2.6 — Filtres produits : tailles & promo** : drawer complété (**Tailles**
+  `CLOTHING_SIZES`, **Pointures** `SHOE_SIZES`, **« En promo uniquement »**),
+  filtres sérialisés dans l'URL et appliqués côté Supabase (`sizes`/`shoe_sizes`
+  overlap, `final_price is not null`) **et** en mode mock. Couleurs/matières du
+  drawer branchées sur la source de vérité `formValues`.
+- **1.5 — Gestion d'erreurs réseau** : helper `getErrorMessage` (+ tests) qui
+  surface le vrai message des services au lieu de « Une erreur est survenue » ;
+  câblé sur toutes les mutations (create/update/delete produits, looks,
+  affectations). Les listes **Produits** et **Looks** distinguent désormais
+  l'état **erreur** (message réel + bouton **Réessayer** via `refetch`) de l'état
+  **vide**.
+- **2.5 — Hauteur des cartes Looks** : `LookCard` passé en **hauteur
+  intrinsèque** (suppression du `.h-look` fixe + `flex-1`/`mt-auto`), grille en
+  `items-start` → plus de vide sous le texte quand le contenu est court.
+
+> **Hors-roadmap, en support des tests** : source de vérité typée des
+> vocabulaires produit (`src/config/formValues.ts` : catégories→types, couleurs,
+> matières, détails, tailles/pointures), formulaire produit entièrement câblé
+> dessus (Détails, Pointures, Fournisseur, Description ajoutés), et générateur de
+> données de masse `supabase/seed_bulk.sql` (500 produits / 200 clients / 120
+> looks, images picsum) — **chargé et vérifié en base live**.
 
 ---
 

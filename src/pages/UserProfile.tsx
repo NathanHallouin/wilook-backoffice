@@ -6,6 +6,7 @@ import { Questionnaire } from '@/components/customers'
 import { LookCard } from '@/components/looks'
 import { useCustomer, useCustomerLooks, useDeleteLook } from '@/hooks'
 import { useSnackbarStore } from '@/stores'
+import { getErrorMessage } from '@/utils/error'
 
 export function UserProfilePage() {
   const { email } = useParams<{ email: string }>()
@@ -29,8 +30,8 @@ export function UserProfilePage() {
     try {
       await deleteLook.mutateAsync(id)
       success('Look supprimé')
-    } catch {
-      showError('Erreur lors de la suppression')
+    } catch (err) {
+      showError(getErrorMessage(err, 'Erreur lors de la suppression'))
     }
   }
 

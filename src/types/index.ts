@@ -36,6 +36,7 @@ export interface ProductFilters {
   shoeSizes?: string[]
   minPrice?: number
   maxPrice?: number
+  onSale?: boolean
 }
 
 // Look Types

@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { FunnelIcon, PlusIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
+import {
+  FunnelIcon,
+  PlusIcon,
+  ShoppingBagIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/outline'
 import { Toolbar } from '@/components/layout'
 import { Button, CardGridSkeleton, EmptyState, useConfirm } from '@/components/ui'
 import { ProductCard, ProductFiltersDrawer } from '@/components/products'
@@ -11,10 +16,9 @@ import {
   useDeleteProduct,
 } from '@/hooks'
 import { useSnackbarStore, useInterfaceStore } from '@/stores'
+import { COLORS, MATERIALS } from '@/config/formValues'
+import { getErrorMessage } from '@/utils/error'
 import type { ProductFilters } from '@/types'
-
-const COMMON_COLORS = ['Noir', 'Blanc', 'Bleu', 'Rouge', 'Vert', 'Gris', 'Beige', 'Marron']
-const COMMON_MATERIALS = ['Coton', 'Laine', 'Soie', 'Lin', 'Polyester', 'Cuir', 'Denim']
 
 export function ProductsPage() {
   const navigate = useNavigate()
@@ -30,12 +34,23 @@ export function ProductsPage() {
     brands: searchParams.get('brands')?.split(',').filter(Boolean),
     colors: searchParams.get('colors')?.split(',').filter(Boolean),
     materials: searchParams.get('materials')?.split(',').filter(Boolean),
+    sizes: searchParams.get('sizes')?.split(',').filter(Boolean),
+    shoeSizes: searchParams.get('shoesizes')?.split(',').filter(Boolean),
     minPrice: searchParams.get('minprice') ? Number(searchParams.get('minprice')) : undefined,
     maxPrice: searchParams.get('maxprice') ? Number(searchParams.get('maxprice')) : undefined,
+    onSale: searchParams.get('onsale') === '1' || undefined,
   }
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteProducts(filters)
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteProducts(filters)
   const { data: brands = [] } = useBrands()
   const { data: types = [] } = useProductTypes()
   const deleteProduct = useDeleteProduct()
@@ -67,8 +82,11 @@ export function ProductsPage() {
       if (newFilters.brands?.length) params.set('brands', newFilters.brands.join(','))
       if (newFilters.colors?.length) params.set('colors', newFilters.colors.join(','))
       if (newFilters.materials?.length) params.set('materials', newFilters.materials.join(','))
+      if (newFilters.sizes?.length) params.set('sizes', newFilters.sizes.join(','))
+      if (newFilters.shoeSizes?.length) params.set('shoesizes', newFilters.shoeSizes.join(','))
       if (newFilters.minPrice) params.set('minprice', String(newFilters.minPrice))
       if (newFilters.maxPrice) params.set('maxprice', String(newFilters.maxPrice))
+      if (newFilters.onSale) params.set('onsale', '1')
       setSearchParams(params)
     },
     [setSearchParams]
@@ -85,8 +103,8 @@ export function ProductsPage() {
     try {
       await deleteProduct.mutateAsync(id)
       success('Produit supprimé')
-    } catch {
-      showError('Erreur lors de la suppression')
+    } catch (err) {
+      showError(getErrorMessage(err, 'Erreur lors de la suppression'))
     }
   }
 
@@ -111,6 +129,13 @@ export function ProductsPage() {
 
         {isLoading && allProducts.length === 0 ? (
           <CardGridSkeleton count={10} />
+        ) : isError && allProducts.length === 0 ? (
+          <EmptyState
+            icon={ExclamationTriangleIcon}
+            title="Impossible de charger les produits"
+            description={getErrorMessage(error)}
+            action={<Button onClick={() => refetch()}>Réessayer</Button>}
+          />
         ) : allProducts.length === 0 ? (
           <EmptyState
             icon={ShoppingBagIcon}
@@ -155,8 +180,8 @@ export function ProductsPage() {
         onFiltersChange={handleFiltersChange}
         availableTypes={types}
         availableBrands={brands}
-        availableColors={COMMON_COLORS}
-        availableMaterials={COMMON_MATERIALS}
+        availableColors={[...COLORS]}
+        availableMaterials={[...MATERIALS]}
       />
     </div>
   )

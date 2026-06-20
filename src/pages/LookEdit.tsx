@@ -15,6 +15,7 @@ import {
   useAssignCustomers,
 } from '@/hooks'
 import { useSnackbarStore, useInterfaceStore } from '@/stores'
+import { getErrorMessage } from '@/utils/error'
 import type { Product, ProductFilters, LookSlot, Customer } from '@/types'
 
 export function LookEditPage() {
@@ -106,8 +107,8 @@ export function LookEditPage() {
 
       success(isEditing ? 'Look mis à jour' : 'Look créé')
       navigate('/looks')
-    } catch {
-      showError('Une erreur est survenue')
+    } catch (err) {
+      showError(getErrorMessage(err))
     }
   }
 

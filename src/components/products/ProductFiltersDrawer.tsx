@@ -2,6 +2,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline'
 import { cn } from '@/utils/cn'
 import { Accordion, Checkbox, Input } from '@/components/ui'
 import { PRODUCT_CATEGORY_LABELS } from '@/config/constants'
+import { CLOTHING_SIZES, SHOE_SIZES } from '@/config/formValues'
 import type { ProductFilters, ProductCategory } from '@/types'
 
 interface ProductFiltersDrawerProps {
@@ -155,6 +156,45 @@ export function ProductFiltersDrawer({
                 />
               ))}
             </div>
+          </Accordion>
+
+          {/* Sizes */}
+          <Accordion title="Tailles">
+            <div className="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+              {CLOTHING_SIZES.map((size) => (
+                <Checkbox
+                  key={size}
+                  label={size}
+                  checked={filters.sizes?.includes(size) || false}
+                  onChange={(checked) => toggleArrayFilter('sizes', size, checked)}
+                />
+              ))}
+            </div>
+          </Accordion>
+
+          {/* Shoe sizes */}
+          <Accordion title="Pointures">
+            <div className="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+              {SHOE_SIZES.map((size) => (
+                <Checkbox
+                  key={size}
+                  label={size}
+                  checked={filters.shoeSizes?.includes(size) || false}
+                  onChange={(checked) => toggleArrayFilter('shoeSizes', size, checked)}
+                />
+              ))}
+            </div>
+          </Accordion>
+
+          {/* Promotion */}
+          <Accordion title="Promotion">
+            <Checkbox
+              label="En promo uniquement"
+              checked={filters.onSale || false}
+              onChange={(checked) =>
+                onFiltersChange({ ...filters, onSale: checked || undefined })
+              }
+            />
           </Accordion>
 
           {/* Price range */}

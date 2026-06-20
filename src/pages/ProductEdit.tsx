@@ -1,10 +1,26 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Toolbar } from '@/components/layout'
-import { Button, Input, Select, Combobox, UploadImages } from '@/components/ui'
-import { useProduct, useCreateProduct, useUpdateProduct, useBrands, useUploadProductImage } from '@/hooks'
+import { Button, Input, Textarea, Select, Combobox, UploadImages } from '@/components/ui'
+import {
+  useProduct,
+  useCreateProduct,
+  useUpdateProduct,
+  useBrands,
+  useProviders,
+  useUploadProductImage,
+} from '@/hooks'
 import { useSnackbarStore } from '@/stores'
+import { getErrorMessage } from '@/utils/error'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CONDITION_LABELS } from '@/config/constants'
+import {
+  COLORS,
+  MATERIALS,
+  DETAILS,
+  CLOTHING_SIZES,
+  SHOE_SIZES,
+  typesForCategory,
+} from '@/config/formValues'
 import type { Product, ProductCategory, ProductCondition } from '@/types'
 
 const categoryOptions = Object.entries(PRODUCT_CATEGORY_LABELS).map(([value, label]) => ({
@@ -47,6 +63,7 @@ export function ProductEditPage() {
   const { success, error: showError } = useSnackbarStore()
   const { data: existingProduct, isLoading } = useProduct(productId ?? undefined)
   const { data: brands = [] } = useBrands()
+  const { data: providers = [] } = useProviders()
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
   const uploadImage = useUploadProductImage()
@@ -127,8 +144,8 @@ export function ProductEditPage() {
 
       success(isEditing ? 'Produit mis à jour' : 'Produit créé')
       navigate('/products')
-    } catch {
-      showError('Une erreur est survenue')
+    } catch (err) {
+      showError(getErrorMessage(err))
     }
   }
 
@@ -202,13 +219,22 @@ export function ProductEditPage() {
                   setFormData((prev) => ({ ...prev, category: value as ProductCategory }))
                 }
               />
-              <Input
-                label="Type"
-                value={formData.type}
-                onChange={(e) => setFormData((prev) => ({ ...prev, type: e.target.value }))}
-                placeholder="Ex: T-shirt, Pantalon..."
-                error={errors.type}
-              />
+              <div>
+                <Combobox
+                  label="Type"
+                  options={[...typesForCategory(formData.category)]}
+                  selected={formData.type ? [formData.type] : []}
+                  onChange={(selected) =>
+                    setFormData((prev) => ({ ...prev, type: selected[0] ?? '' }))
+                  }
+                  placeholder="Sélectionner un type..."
+                  allowCreate
+                  multiple={false}
+                />
+                {errors.type && (
+                  <p className="mt-1 text-xs text-red-600">{errors.type}</p>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -231,6 +257,29 @@ export function ProductEditPage() {
                 multiple={false}
               />
             </div>
+
+            <Combobox
+              label="Fournisseur"
+              options={providers}
+              selected={formData.provider ? [formData.provider] : []}
+              onChange={(selected) =>
+                setFormData((prev) => ({ ...prev, provider: selected[0] || null }))
+              }
+              allowCreate
+              multiple={false}
+            />
+
+            <Textarea
+              label="Description"
+              value={formData.description ?? ''}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value || null,
+                }))
+              }
+              placeholder="Description du produit..."
+            />
           </div>
 
           {/* Attributes */}
@@ -239,7 +288,7 @@ export function ProductEditPage() {
 
             <Combobox
               label="Couleurs"
-              options={['Noir', 'Blanc', 'Bleu', 'Rouge', 'Vert', 'Gris', 'Beige', 'Marron']}
+              options={[...COLORS]}
               selected={formData.colors}
               onChange={(colors) => setFormData((prev) => ({ ...prev, colors }))}
               allowCreate
@@ -247,18 +296,37 @@ export function ProductEditPage() {
 
             <Combobox
               label="Matières"
-              options={['Coton', 'Laine', 'Soie', 'Lin', 'Polyester', 'Cuir', 'Denim']}
+              options={[...MATERIALS]}
               selected={formData.materials}
               onChange={(materials) => setFormData((prev) => ({ ...prev, materials }))}
               allowCreate
             />
 
             <Combobox
-              label="Tailles"
-              options={['XS', 'S', 'M', 'L', 'XL', 'XXL']}
-              selected={formData.sizes}
-              onChange={(sizes) => setFormData((prev) => ({ ...prev, sizes }))}
+              label="Détails"
+              options={[...DETAILS]}
+              selected={formData.details}
+              onChange={(details) => setFormData((prev) => ({ ...prev, details }))}
+              allowCreate
             />
+
+            {formData.category === 'shoes' ? (
+              <Combobox
+                label="Pointures"
+                options={[...SHOE_SIZES]}
+                selected={formData.shoe_sizes}
+                onChange={(shoe_sizes) => setFormData((prev) => ({ ...prev, shoe_sizes }))}
+                allowCreate
+              />
+            ) : (
+              <Combobox
+                label="Tailles"
+                options={[...CLOTHING_SIZES]}
+                selected={formData.sizes}
+                onChange={(sizes) => setFormData((prev) => ({ ...prev, sizes }))}
+                allowCreate
+              />
+            )}
           </div>
 
           {/* Price */}

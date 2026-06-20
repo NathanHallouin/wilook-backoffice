@@ -30,11 +30,23 @@ export async function fetchProducts(
     if (filters?.colors?.length) {
       products = products.filter(p => p.colors.some(c => filters.colors!.includes(c)))
     }
+    if (filters?.materials?.length) {
+      products = products.filter(p => p.materials.some(m => filters.materials!.includes(m)))
+    }
+    if (filters?.sizes?.length) {
+      products = products.filter(p => p.sizes.some(s => filters.sizes!.includes(s)))
+    }
+    if (filters?.shoeSizes?.length) {
+      products = products.filter(p => p.shoe_sizes.some(s => filters.shoeSizes!.includes(s)))
+    }
     if (filters?.minPrice !== undefined) {
       products = products.filter(p => p.price >= filters.minPrice!)
     }
     if (filters?.maxPrice !== undefined) {
       products = products.filter(p => p.price <= filters.maxPrice!)
+    }
+    if (filters?.onSale) {
+      products = products.filter(p => p.final_price != null && p.final_price < p.price)
     }
 
     // Pagination
@@ -84,6 +96,10 @@ export async function fetchProducts(
   }
   if (filters?.maxPrice !== undefined) {
     query = query.lte('price', filters.maxPrice)
+  }
+  if (filters?.onSale) {
+    // "En promo" = un prix promo est défini (le seed garantit final_price < price).
+    query = query.not('final_price', 'is', null)
   }
 
   if (options?.sort) {
@@ -217,6 +233,23 @@ export async function fetchBrands(): Promise<string[]> {
   }
 
   return data?.map(d => d.brand).filter(Boolean) ?? []
+}
+
+export async function fetchProviders(): Promise<string[]> {
+  if (!isSupabaseConfigured) {
+    const products = mockDb.getProducts()
+    return [...new Set(products.map(p => p.provider).filter(Boolean) as string[])]
+  }
+
+  const { data, error } = await supabase!
+    .from('providers')
+    .select('provider')
+
+  if (error) {
+    throw new Error(`Failed to fetch providers: ${error.message}`)
+  }
+
+  return data?.map(d => d.provider).filter(Boolean) ?? []
 }
 
 export async function fetchProductTypes(): Promise<string[]> {
