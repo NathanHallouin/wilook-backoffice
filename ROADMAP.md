@@ -63,6 +63,13 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
 - **2.5 — Hauteur des cartes Looks** : `LookCard` passé en **hauteur
   intrinsèque** (suppression du `.h-look` fixe + `flex-1`/`mt-auto`), grille en
   `items-start` → plus de vide sous le texte quand le contenu est court.
+- **2.3 — Actions groupées** : sélection multiple sur **Produits** et **Looks**
+  (case sur chaque carte au survol, clic sur la carte pour (dé)sélectionner) via
+  un hook réutilisable `useSelection` + composant `SelectionBar` flottant.
+  **Suppression en masse** (`deleteProducts`/`deleteLooks` en une requête `.in()`
+  + hooks). **Raccourcis clavier** : `Échap` annule, `Ctrl/Cmd+A` tout
+  sélectionner, `Suppr`/`Retour arrière` supprime (hors champs de saisie). La
+  sélection se réinitialise au changement d'onglet (Looks).
 
 > **Hors-roadmap, en support des tests** : source de vérité typée des
 > vocabulaires produit (`src/config/formValues.ts` : catégories→types, couleurs,

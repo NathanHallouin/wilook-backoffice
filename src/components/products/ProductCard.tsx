@@ -5,6 +5,7 @@ import {
   PencilIcon,
   TrashIcon,
   PhotoIcon,
+  CheckIcon,
 } from '@heroicons/react/24/outline'
 import { cn } from '@/utils/cn'
 import { PRODUCT_CATEGORY_LABELS } from '@/config/constants'
@@ -15,6 +16,9 @@ interface ProductCardProps {
   onDelete: (id: string) => void
   draggable?: boolean
   onDragStart?: (e: React.DragEvent, product: Product) => void
+  selectable?: boolean
+  selected?: boolean
+  onToggleSelect?: (id: string) => void
 }
 
 const priceFmt = new Intl.NumberFormat('fr-FR', {
@@ -27,6 +31,9 @@ export function ProductCard({
   onDelete,
   draggable = false,
   onDragStart,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
 }: ProductCardProps) {
   const navigate = useNavigate()
   const [showMenu, setShowMenu] = useState(false)
@@ -49,13 +56,37 @@ export function ProductCard({
   return (
     <div
       className={cn(
-        'group relative flex h-card flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white',
+        'group relative flex h-card flex-col overflow-hidden rounded-2xl border bg-white',
         'shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover',
-        draggable && 'cursor-grab active:cursor-grabbing'
+        selected ? 'border-brand-500 ring-2 ring-brand-500' : 'border-gray-200',
+        draggable && 'cursor-grab active:cursor-grabbing',
+        selectable && 'cursor-pointer'
       )}
       draggable={draggable}
       onDragStart={(e) => onDragStart?.(e, product)}
+      onClick={selectable ? () => onToggleSelect?.(product.id) : undefined}
     >
+      {/* Selection checkbox */}
+      {selectable && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggleSelect?.(product.id)
+          }}
+          aria-label={selected ? 'Désélectionner' : 'Sélectionner'}
+          aria-pressed={selected}
+          className={cn(
+            'absolute left-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-md border-2 backdrop-blur transition',
+            selected
+              ? 'border-brand-600 bg-brand-600 text-white opacity-100'
+              : 'border-gray-300 bg-white/90 text-transparent opacity-0 group-hover:opacity-100'
+          )}
+        >
+          <CheckIcon className="h-4 w-4" strokeWidth={3} />
+        </button>
+      )}
+
       {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         {product.thumbnail ? (

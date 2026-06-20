@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   FunnelIcon,
@@ -7,13 +7,15 @@ import {
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline'
 import { Toolbar } from '@/components/layout'
-import { Button, CardGridSkeleton, EmptyState, useConfirm } from '@/components/ui'
+import { Button, CardGridSkeleton, EmptyState, SelectionBar, useConfirm } from '@/components/ui'
 import { ProductCard, ProductFiltersDrawer } from '@/components/products'
 import {
   useInfiniteProducts,
   useBrands,
   useProductTypes,
   useDeleteProduct,
+  useDeleteProducts,
+  useSelection,
 } from '@/hooks'
 import { useSnackbarStore, useInterfaceStore } from '@/stores'
 import { COLORS, MATERIALS } from '@/config/formValues'
@@ -54,10 +56,14 @@ export function ProductsPage() {
   const { data: brands = [] } = useBrands()
   const { data: types = [] } = useProductTypes()
   const deleteProduct = useDeleteProduct()
+  const deleteProducts = useDeleteProducts()
   const confirm = useConfirm()
 
-  const allProducts = data?.pages.flatMap((p) => p.data) ?? []
+  const allProducts = useMemo(() => data?.pages.flatMap((p) => p.data) ?? [], [data])
   const count = data?.pages[0]?.count ?? 0
+
+  const allIds = useMemo(() => allProducts.map((p) => p.id), [allProducts])
+  const selection = useSelection(allIds)
 
   // Infinite scroll — fetch the next page when the sentinel comes into view
   useEffect(() => {
@@ -108,6 +114,46 @@ export function ProductsPage() {
     }
   }
 
+  const handleBulkDelete = useCallback(async () => {
+    if (selection.count === 0) return
+    const n = selection.count
+    const ok = await confirm({
+      title: `Supprimer ${n} produit${n > 1 ? 's' : ''}`,
+      message: `Les ${n} produits sélectionnés seront définitivement supprimés. Cette action est irréversible.`,
+      confirmLabel: 'Supprimer',
+      danger: true,
+    })
+    if (!ok) return
+    try {
+      await deleteProducts.mutateAsync(selection.ids)
+      success(`${n} produit${n > 1 ? 's' : ''} supprimé${n > 1 ? 's' : ''}`)
+      selection.clear()
+    } catch (err) {
+      showError(getErrorMessage(err, 'Erreur lors de la suppression'))
+    }
+  }, [selection, confirm, deleteProducts, success, showError])
+
+  // Keyboard shortcuts: Esc clears, Ctrl/Cmd+A selects all, Del/Backspace deletes
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA'
+      if (e.key === 'Escape') {
+        selection.clear()
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'a' && !typing) {
+        if (allIds.length) {
+          e.preventDefault()
+          selection.selectAll()
+        }
+      } else if ((e.key === 'Delete' || e.key === 'Backspace') && !typing && selection.count > 0) {
+        e.preventDefault()
+        handleBulkDelete()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selection, allIds, handleBulkDelete])
+
   return (
     <div className="min-h-screen">
       <Toolbar title="Produits">
@@ -157,6 +203,9 @@ export function ProductsPage() {
                   key={product.id}
                   product={product}
                   onDelete={handleDelete}
+                  selectable
+                  selected={selection.isSelected(product.id)}
+                  onToggleSelect={selection.toggle}
                 />
               ))}
             </div>
@@ -172,6 +221,17 @@ export function ProductsPage() {
           </>
         )}
       </div>
+
+      <SelectionBar
+        noun="produit"
+        count={selection.count}
+        total={count}
+        allSelected={selection.allSelected}
+        onSelectAll={selection.selectAll}
+        onClear={selection.clear}
+        onDelete={handleBulkDelete}
+        busy={deleteProducts.isPending}
+      />
 
       <ProductFiltersDrawer
         isOpen={filtersOpen}

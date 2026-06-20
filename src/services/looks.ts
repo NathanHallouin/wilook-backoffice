@@ -162,6 +162,24 @@ export async function deleteLook(id: string): Promise<void> {
   }
 }
 
+export async function deleteLooks(ids: string[]): Promise<void> {
+  if (ids.length === 0) return
+
+  if (!isSupabaseConfigured) {
+    ids.forEach(id => mockDb.deleteLook(id))
+    return
+  }
+
+  const { error } = await supabase!
+    .from(TABLES.LOOKS)
+    .delete()
+    .in('id', ids)
+
+  if (error) {
+    throw new Error(`Failed to delete looks: ${error.message}`)
+  }
+}
+
 export async function createLookForCustomer(email: string): Promise<Look> {
   const look = await createLook({})
   await assignCustomersToLook(look.id, [email])

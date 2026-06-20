@@ -193,6 +193,24 @@ export async function deleteProduct(id: string): Promise<void> {
   }
 }
 
+export async function deleteProducts(ids: string[]): Promise<void> {
+  if (ids.length === 0) return
+
+  if (!isSupabaseConfigured) {
+    ids.forEach(id => mockDb.deleteProduct(id))
+    return
+  }
+
+  const { error } = await supabase!
+    .from(TABLES.PRODUCTS)
+    .delete()
+    .in('id', ids)
+
+  if (error) {
+    throw new Error(`Failed to delete products: ${error.message}`)
+  }
+}
+
 export async function uploadProductImage(productId: string, file: File): Promise<string> {
   if (!isSupabaseConfigured) {
     // Return a blob URL for mock mode

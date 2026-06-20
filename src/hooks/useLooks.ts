@@ -74,6 +74,17 @@ export function useDeleteLook() {
   })
 }
 
+export function useDeleteLooks() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (ids: string[]) => looksService.deleteLooks(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+    },
+  })
+}
+
 export function useCreateLookForCustomer() {
   const queryClient = useQueryClient()
 

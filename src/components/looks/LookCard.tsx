@@ -5,6 +5,7 @@ import {
   TrashIcon,
   UsersIcon,
   SparklesIcon,
+  CheckIcon,
 } from '@heroicons/react/24/outline'
 import { useState } from 'react'
 import { cn } from '@/utils/cn'
@@ -13,9 +14,18 @@ import type { Look } from '@/types'
 interface LookCardProps {
   look: Look
   onDelete: (id: string) => void
+  selectable?: boolean
+  selected?: boolean
+  onToggleSelect?: (id: string) => void
 }
 
-export function LookCard({ look, onDelete }: LookCardProps) {
+export function LookCard({
+  look,
+  onDelete,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
+}: LookCardProps) {
   const navigate = useNavigate()
   const [showMenu, setShowMenu] = useState(false)
 
@@ -37,7 +47,35 @@ export function LookCard({ look, onDelete }: LookCardProps) {
     look.right_bottom
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
+    <div
+      className={cn(
+        'group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover',
+        selected ? 'border-brand-500 ring-2 ring-brand-500' : 'border-gray-200',
+        selectable && 'cursor-pointer'
+      )}
+      onClick={selectable ? () => onToggleSelect?.(look.id) : undefined}
+    >
+      {/* Selection checkbox */}
+      {selectable && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggleSelect?.(look.id)
+          }}
+          aria-label={selected ? 'Désélectionner' : 'Sélectionner'}
+          aria-pressed={selected}
+          className={cn(
+            'absolute left-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-md border-2 backdrop-blur transition',
+            selected
+              ? 'border-brand-600 bg-brand-600 text-white opacity-100'
+              : 'border-gray-300 bg-white/90 text-transparent opacity-0 group-hover:opacity-100'
+          )}
+        >
+          <CheckIcon className="h-4 w-4" strokeWidth={3} />
+        </button>
+      )}
+
       {/* Preview */}
       <div className="relative h-48 overflow-hidden bg-gray-100">
         {look.thumbnail ? (

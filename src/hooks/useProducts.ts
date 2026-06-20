@@ -77,6 +77,17 @@ export function useDeleteProduct() {
   })
 }
 
+export function useDeleteProducts() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (ids: string[]) => productsService.deleteProducts(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY] })
+    },
+  })
+}
+
 export function useUploadProductImage() {
   return useMutation({
     mutationFn: ({ productId, file }: { productId: string; file: File }) =>

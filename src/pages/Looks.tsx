@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PlusIcon, SparklesIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Toolbar } from '@/components/layout'
-import { Button, CardGridSkeleton, EmptyState, useConfirm } from '@/components/ui'
+import { Button, CardGridSkeleton, EmptyState, SelectionBar, useConfirm } from '@/components/ui'
 import { LookCard } from '@/components/looks'
-import { useInfiniteLooks, useDeleteLook } from '@/hooks'
+import { useInfiniteLooks, useDeleteLook, useDeleteLooks, useSelection } from '@/hooks'
 import { useSnackbarStore } from '@/stores'
 import { cn } from '@/utils/cn'
 import { getErrorMessage } from '@/utils/error'
@@ -32,11 +32,15 @@ export function LooksPage() {
     isFetchingNextPage,
   } = useInfiniteLooks(activeTab)
   const deleteLook = useDeleteLook()
+  const deleteLooks = useDeleteLooks()
   const confirm = useConfirm()
 
   const loaderRef = useRef<HTMLDivElement>(null)
-  const allLooks = data?.pages.flatMap((p) => p.data) ?? []
+  const allLooks = useMemo(() => data?.pages.flatMap((p) => p.data) ?? [], [data])
   const count = data?.pages[0]?.count ?? 0
+
+  const allIds = useMemo(() => allLooks.map((l) => l.id), [allLooks])
+  const selection = useSelection(allIds)
 
   // Infinite scroll
   useEffect(() => {
@@ -68,6 +72,52 @@ export function LooksPage() {
       showError(getErrorMessage(err, 'Erreur lors de la suppression'))
     }
   }
+
+  const handleBulkDelete = useCallback(async () => {
+    if (selection.count === 0) return
+    const n = selection.count
+    const ok = await confirm({
+      title: `Supprimer ${n} look${n > 1 ? 's' : ''}`,
+      message: `Les ${n} looks sélectionnés seront définitivement supprimés. Cette action est irréversible.`,
+      confirmLabel: 'Supprimer',
+      danger: true,
+    })
+    if (!ok) return
+    try {
+      await deleteLooks.mutateAsync(selection.ids)
+      success(`${n} look${n > 1 ? 's' : ''} supprimé${n > 1 ? 's' : ''}`)
+      selection.clear()
+    } catch (err) {
+      showError(getErrorMessage(err, 'Erreur lors de la suppression'))
+    }
+  }, [selection, confirm, deleteLooks, success, showError])
+
+  // Clear the selection when switching tabs (the visible set changes).
+  const clearSelection = selection.clear
+  useEffect(() => {
+    clearSelection()
+  }, [activeTab, clearSelection])
+
+  // Keyboard shortcuts: Esc clears, Ctrl/Cmd+A selects all, Del/Backspace deletes
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA'
+      if (e.key === 'Escape') {
+        selection.clear()
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'a' && !typing) {
+        if (allIds.length) {
+          e.preventDefault()
+          selection.selectAll()
+        }
+      } else if ((e.key === 'Delete' || e.key === 'Backspace') && !typing && selection.count > 0) {
+        e.preventDefault()
+        handleBulkDelete()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selection, allIds, handleBulkDelete])
 
   return (
     <div className="min-h-screen">
@@ -127,7 +177,14 @@ export function LooksPage() {
           <>
             <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {allLooks.map((look) => (
-                <LookCard key={look.id} look={look} onDelete={handleDelete} />
+                <LookCard
+                  key={look.id}
+                  look={look}
+                  onDelete={handleDelete}
+                  selectable
+                  selected={selection.isSelected(look.id)}
+                  onToggleSelect={selection.toggle}
+                />
               ))}
             </div>
 
@@ -142,6 +199,17 @@ export function LooksPage() {
           </>
         )}
       </div>
+
+      <SelectionBar
+        noun="look"
+        count={selection.count}
+        total={count}
+        allSelected={selection.allSelected}
+        onSelectAll={selection.selectAll}
+        onClear={selection.clear}
+        onDelete={handleBulkDelete}
+        busy={deleteLooks.isPending}
+      />
     </div>
   )
 }
