@@ -40,10 +40,15 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
 - **1.4 — Optimisation d'images** : util `processImage` (redimensionnement à
   `IMAGE_CONFIG.MAX_HEIGHT` + ré-encodage **WebP**, fallback sûr) branché sur les
   uploads produit et vignette de look.
-- **1.1 — Tests (amorcé)** : Vitest + Testing Library + jsdom configurés ;
-  **15 tests** (`cn`, `processImage`, store snackbar, `Button`, `EmptyState`) ;
-  scripts `test` / `test:watch` / `test:coverage` ; étape **Test** ajoutée à la CI.
-  *Reste* : tests des hooks/services et e2e Playwright.
+- **1.1 — Tests (en cours)** : Vitest + Testing Library + jsdom configurés ;
+  **47 tests** — utilitaires (`cn`, `processImage`, `getErrorMessage`), store
+  snackbar, composants (`Button`, `EmptyState`, `SelectionBar`), **hook**
+  `useSelection`, et **services en mode mock** : `products` (filtres + suppression
+  groupée), `looks` (filtres all/public/unused, create/bulk-delete), `customers`
+  (recherche, tri, CRUD) ; scripts `test` / `test:watch` / `test:coverage` ;
+  étape **Test** dans la CI.
+  *Reste* : e2e Playwright (parcours clés) et éventuellement les hooks data
+  (TanStack Query).
 - **1.6 — Code mort résolu** : les vues `providers`/`designers`/`univers` et les RPC
   `get_all_looks`/`get_nb_looks_users` (déclarées dans `constants.ts`) sont
   désormais **implémentées** dans `schema.sql` et **appliquées en base live**
@@ -70,6 +75,10 @@ Légende statut : 🔴 critique · 🟠 important · 🟡 confort · 🟢 bonus
   + hooks). **Raccourcis clavier** : `Échap` annule, `Ctrl/Cmd+A` tout
   sélectionner, `Suppr`/`Retour arrière` supprime (hors champs de saisie). La
   sélection se réinitialise au changement d'onglet (Looks).
+- **2.4 — Look builder** : on peut désormais **vider un slot** (bouton × au
+  survol **ou** clic droit) et **annuler** la composition (bouton « Annuler la
+  composition » + `Ctrl/Cmd+Z`) via un historique des états de slots, réinitialisé
+  au chargement d'un look. Filtres produits du builder branchés sur `formValues`.
 
 > **Hors-roadmap, en support des tests** : source de vérité typée des
 > vocabulaires produit (`src/config/formValues.ts` : catégories→types, couleurs,

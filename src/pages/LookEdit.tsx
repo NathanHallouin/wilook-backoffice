@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { FunnelIcon } from '@heroicons/react/24/outline'
+import { FunnelIcon, ArrowUturnLeftIcon } from '@heroicons/react/24/outline'
 import { Toolbar } from '@/components/layout'
 import { Button, Input, Checkbox } from '@/components/ui'
 import { LookPreview, CustomerFinder, CustomerInfo } from '@/components/looks'
@@ -16,7 +16,10 @@ import {
 } from '@/hooks'
 import { useSnackbarStore, useInterfaceStore } from '@/stores'
 import { getErrorMessage } from '@/utils/error'
+import { COLORS, MATERIALS } from '@/config/formValues'
 import type { Product, ProductFilters, LookSlot, Customer } from '@/types'
+
+type Slots = Partial<Record<LookSlot, Product | null>>
 
 export function LookEditPage() {
   const navigate = useNavigate()
@@ -37,7 +40,8 @@ export function LookEditPage() {
   const [designer, setDesigner] = useState('')
   const [universe, setUniverse] = useState('')
   const [isPublic, setIsPublic] = useState(false)
-  const [slots, setSlots] = useState<Partial<Record<LookSlot, Product | null>>>({})
+  const [slots, setSlots] = useState<Slots>({})
+  const [history, setHistory] = useState<Slots[]>([])
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
 
   // Products for drag
@@ -62,11 +66,47 @@ export function LookEditPage() {
       right_middle: existingLook.right_middle_product || null,
       right_bottom: existingLook.right_bottom_product || null,
     })
+    setHistory([])
   }
 
-  const handleDrop = useCallback((slot: LookSlot, product: Product) => {
-    setSlots((prev) => ({ ...prev, [slot]: product }))
-  }, [])
+  const handleDrop = useCallback(
+    (slot: LookSlot, product: Product) => {
+      setHistory((h) => [...h, slots])
+      setSlots((prev) => ({ ...prev, [slot]: product }))
+    },
+    [slots]
+  )
+
+  const handleClearSlot = useCallback(
+    (slot: LookSlot) => {
+      if (!slots[slot]) return
+      setHistory((h) => [...h, slots])
+      setSlots((prev) => ({ ...prev, [slot]: null }))
+    },
+    [slots]
+  )
+
+  const canUndo = history.length > 0
+
+  const handleUndo = useCallback(() => {
+    if (history.length === 0) return
+    setSlots(history[history.length - 1])
+    setHistory((h) => h.slice(0, -1))
+  }, [history])
+
+  // Ctrl/Cmd+Z annule la dernière modification de composition
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+        const tag = (e.target as HTMLElement)?.tagName
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return
+        e.preventDefault()
+        handleUndo()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [handleUndo])
 
   const handleDragStart = (e: React.DragEvent, product: Product) => {
     e.dataTransfer.setData('application/json', JSON.stringify(product))
@@ -130,8 +170,17 @@ export function LookEditPage() {
           <FunnelIcon className="h-5 w-5 mr-2" />
           Filtres produits
         </Button>
+        <Button
+          variant="ghost"
+          onClick={handleUndo}
+          disabled={!canUndo}
+          title="Annuler la dernière modification (Ctrl/Cmd+Z)"
+        >
+          <ArrowUturnLeftIcon className="h-5 w-5 mr-2" />
+          Annuler la composition
+        </Button>
         <Button variant="ghost" onClick={() => navigate('/looks')}>
-          Annuler
+          Quitter
         </Button>
         <Button
           onClick={handleSubmit}
@@ -152,7 +201,7 @@ export function LookEditPage() {
 
             {selectedCustomer && <CustomerInfo customer={selectedCustomer} />}
 
-            <LookPreview slots={slots} onDrop={handleDrop} />
+            <LookPreview slots={slots} onDrop={handleDrop} onClear={handleClearSlot} />
 
             {/* Look info */}
             <div className="rounded-2xl border border-gray-200 bg-white shadow-card p-4 space-y-3">
@@ -215,8 +264,8 @@ export function LookEditPage() {
         onFiltersChange={setProductFilters}
         availableTypes={types}
         availableBrands={brands}
-        availableColors={['Noir', 'Blanc', 'Bleu', 'Rouge', 'Vert', 'Gris', 'Beige', 'Marron']}
-        availableMaterials={['Coton', 'Laine', 'Soie', 'Lin', 'Polyester', 'Cuir', 'Denim']}
+        availableColors={[...COLORS]}
+        availableMaterials={[...MATERIALS]}
       />
     </div>
   )

@@ -1,3 +1,4 @@
+import { XMarkIcon } from '@heroicons/react/24/outline'
 import { cn } from '@/utils/cn'
 import { LOOK_SLOTS } from '@/config/constants'
 import type { Product, LookSlot } from '@/types'
@@ -6,6 +7,7 @@ interface LookPreviewProps {
   slots: Partial<Record<LookSlot, Product | null>>
   onSlotClick?: (slot: LookSlot) => void
   onDrop?: (slot: LookSlot, product: Product) => void
+  onClear?: (slot: LookSlot) => void
   activeSlot?: LookSlot | null
 }
 
@@ -17,7 +19,7 @@ const slotLabels: Record<LookSlot, string> = {
   right_bottom: 'Bas droit',
 }
 
-export function LookPreview({ slots, onSlotClick, onDrop, activeSlot }: LookPreviewProps) {
+export function LookPreview({ slots, onSlotClick, onDrop, onClear, activeSlot }: LookPreviewProps) {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     e.currentTarget.classList.add('ring-2', 'ring-brand-500')
@@ -49,23 +51,47 @@ export function LookPreview({ slots, onSlotClick, onDrop, activeSlot }: LookPrev
       <div
         key={slot}
         className={cn(
-          'relative flex cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all',
+          'group relative flex cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all',
           'hover:border-brand-400 hover:bg-brand-50',
           activeSlot === slot && 'border-brand-500 bg-brand-50',
           product && 'border-solid border-gray-200 bg-gray-100',
           className
         )}
         onClick={() => onSlotClick?.(slot)}
+        onContextMenu={
+          product && onClear
+            ? (e) => {
+                e.preventDefault()
+                onClear(slot)
+              }
+            : undefined
+        }
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={(e) => handleDrop(e, slot)}
       >
         {product ? (
-          <img
-            src={product.thumbnail || product.images[0]}
-            alt={product.title}
-            className="w-full h-full object-cover rounded-lg"
-          />
+          <>
+            <img
+              src={product.thumbnail || product.images[0]}
+              alt={product.title}
+              className="w-full h-full object-cover rounded-lg"
+            />
+            {onClear && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onClear(slot)
+                }}
+                aria-label={`Vider ${slotLabels[slot]}`}
+                title="Vider ce slot (clic droit aussi)"
+                className="absolute right-1 top-1 z-10 rounded-full bg-white/90 p-1 text-gray-600 opacity-0 shadow-sm ring-1 ring-gray-200 backdrop-blur transition hover:bg-white hover:text-red-600 group-hover:opacity-100"
+              >
+                <XMarkIcon className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </>
         ) : (
           <span className="text-xs text-gray-400 text-center p-2">
             {slotLabels[slot]}
