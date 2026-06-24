@@ -8,7 +8,9 @@ supabase/
 ├── migrations/
 │   └── 20260620120000_initial_schema.sql    # full schema: tables, views, RPC, RLS, storage
 ├── seed.sql                                 # small demo dataset (mirrors the mock data)
-└── seed_bulk.sql                            # optional: large generated dataset for load testing
+├── seed_bulk.sql                            # optional: large generated dataset for load testing
+└── functions/
+    └── ai-suggestions/                      # Claude-powered clothing suggestions (Edge Function)
 ```
 
 ## Applying the schema
@@ -42,6 +44,30 @@ Supabase SQL Editor and run it. It is idempotent (safe to re-run).
   placeholder images, for pagination / filter / load testing. Run it manually in
   the SQL Editor (or via `psql`). A commented CLEANUP block at the bottom removes
   only the generated rows.
+
+## Edge Functions
+
+### `ai-suggestions` — Claude-powered clothing recommendations
+
+Ranks catalogue products against a customer's questionnaire and composes a full
+look, using Claude (`claude-opus-4-8`) with structured outputs. The app calls it
+from the customer profile page; if Supabase or the function is unavailable, the
+client falls back to a **local scoring engine** (`src/services/suggestions.ts`),
+so the feature works in demo mode too — just without generative AI.
+
+```bash
+# Set the Anthropic API key as a function secret (server-side only — never shipped to the browser)
+supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
+
+# Deploy
+supabase functions deploy ai-suggestions
+
+# Local testing
+supabase functions serve ai-suggestions --env-file supabase/functions/.env.local
+```
+
+The function only returns product **ids** (plus scores/reasons); the client maps
+them back to real products, so the model can never inject bogus catalogue data.
 
 ## Adding a change
 

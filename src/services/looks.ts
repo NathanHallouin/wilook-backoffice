@@ -180,8 +180,8 @@ export async function deleteLooks(ids: string[]): Promise<void> {
   }
 }
 
-export async function createLookForCustomer(email: string): Promise<Look> {
-  const look = await createLook({})
+export async function createLookForCustomer(email: string, fields?: Partial<Look>): Promise<Look> {
+  const look = await createLook(fields ?? {})
   await assignCustomersToLook(look.id, [email])
   return look
 }

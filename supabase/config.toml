@@ -12,3 +12,9 @@ major_version = 15
 [db.seed]
 enabled = true
 sql_paths = ["./seed.sql"]
+
+# Claude-powered clothing suggestions. Invoked from the app via
+# supabase.functions.invoke('ai-suggestions'); requires the ANTHROPIC_API_KEY
+# secret (supabase secrets set ANTHROPIC_API_KEY=sk-ant-...).
+[functions.ai-suggestions]
+verify_jwt = true

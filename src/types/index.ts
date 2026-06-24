@@ -107,6 +107,36 @@ export interface CustomerWithStats extends Customer {
   last_look_date: string | null
 }
 
+// AI Suggestion Types
+/** Source of a suggestion result: the Claude-powered edge function or the local scoring engine. */
+export type SuggestionSource = 'ai' | 'local'
+
+/** A catalogue product proposed for a customer, with an explainable match score. */
+export interface SuggestedProduct {
+  product: Product
+  /** Match score, 0–100. Higher is a better fit. */
+  score: number
+  /** Human-readable justifications ("Couleur préférée : Noir", "Dans le budget", …). */
+  reasons: string[]
+}
+
+/** A full outfit proposal: one product per look slot, ready to be saved as a Look. */
+export interface LookSuggestion {
+  /** Chosen product for each of the 5 look slots (a slot may be left empty). */
+  slots: Partial<Record<LookSlot, Product>>
+  /** Why these pieces work together for this customer. */
+  rationale: string
+}
+
+/** The complete output of a suggestion run: an overview, ranked products and an outfit. */
+export interface AiSuggestionResult {
+  source: SuggestionSource
+  /** Natural-language overview of the recommendation. */
+  summary: string
+  products: SuggestedProduct[]
+  look: LookSuggestion | null
+}
+
 // API Types
 export interface PaginationOptions {
   page?: number

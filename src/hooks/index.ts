@@ -1,5 +1,6 @@
 export * from './useProducts'
 export * from './useLooks'
 export * from './useCustomers'
+export * from './useSuggestions'
 export * from './useSelection'
 export * from './useGlobalShortcuts'

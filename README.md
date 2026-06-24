@@ -35,6 +35,13 @@ A modern backoffice application for managing a fashion e-commerce business, buil
 - Style preferences tracking
 - Look history per customer
 
+### AI Clothing Suggestions
+- Personalized product recommendations from a customer's questionnaire
+  (styles, colors, sizes, budget) with explainable match scores
+- One-click generation of a complete look, saveable and assignable to the customer
+- Powered by **Claude** via a Supabase Edge Function when configured, with an
+  always-available **local scoring engine** fallback (works in demo mode, no API key)
+
 ### Demo Mode
 When Supabase is not configured, the app runs in **demo mode**:
 - Data is stored locally in localStorage

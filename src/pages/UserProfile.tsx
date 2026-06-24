@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { Toolbar } from '@/components/layout'
 import { Button, useConfirm } from '@/components/ui'
-import { Questionnaire } from '@/components/customers'
+import { Questionnaire, AiSuggestions } from '@/components/customers'
 import { LookCard } from '@/components/looks'
 import { useCustomer, useCustomerLooks, useDeleteLook } from '@/hooks'
 import { useSnackbarStore } from '@/stores'
@@ -100,6 +100,9 @@ export function UserProfilePage() {
 
         {/* Questionnaire */}
         <Questionnaire customer={customer} />
+
+        {/* AI clothing suggestions */}
+        <AiSuggestions customer={customer} />
 
         {/* Looks */}
         <div className="rounded-2xl border border-gray-200 bg-surface shadow-card p-6">
